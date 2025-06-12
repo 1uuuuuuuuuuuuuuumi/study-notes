@@ -1,0 +1,15 @@
+# macOS 시스템 파일
+.DS_Store
+
+# 파이썬 관련
+__pycache__/
+*.pyc
+
+# VSCode 설정
+.vscode/
+
+# Node.js 프로젝트용
+node_modules/
+
+# 환경설정/비밀키
+.env

@@ -2,37 +2,18 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>리터럴 실습 예제</title>
+  <title>예제</title>
 </head>
 <body>
-  <h1>💡 자바스크립트 리터럴 실습</h1>
-  <button onclick="showInfo()">정보 보기</button>
-
-  <p id="output"></p>
-
   <script>
-    
-    // 문자열 리터럴
-    const name = "호빵맨";
-    
-    // 숫자 리터럴
-    const age = 11;
-    
-    // 불리언 리터럴
-    const isStudent = false;
+    let name = "호빵맨";
+const age = 11;
+var nickname = "암빰맘";
 
-    // 객체 리터럴
-    const user = {
-      name: name,
-      age: age,
-      isStudent: isStudent
-    };
+console.log(name);
+console.log(age);
+console.log(nickname);
 
-    // 클릭 시 동작하는 함수
-    function showInfo() {
-      const output = document.getElementById("output");
-      output.innerText = `${user.name} (${user.age}세) - 학생 여부: ${user.isStudent}`;
-    }
   </script>
 </body>
 </html>

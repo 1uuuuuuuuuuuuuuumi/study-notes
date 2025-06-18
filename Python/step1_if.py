@@ -11,3 +11,8 @@ else:
   print("1234dkdkdkdkdkdk")
 
 print(rd1)
+
+name = "호빵맨"
+age = 11
+
+print("안녕, 나는", name, "이고 나이는", age, "살이야!")

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>루미의 호이스팅 실험실 🧠</title>
+</head>
+<body>
+  <h1>✨ 자바스크립트 호이스팅 실험실 ✨</h1>
+  <p>F12를 눌러 콘솔에서 결과를 확인해보세요!</p>
+
+  <script>
+    // 예제 1: var는 호이스팅되고 undefined로 초기화됨
+    console.log("[1] var 변수:", 루미1); // 👉 undefined
+    var 루미1 = "해삼";
+
+    // 예제 2: let은 호이스팅되지만 TDZ 때문에 에러!
+    try {
+      console.log("[2] let 변수:", 루미2); // ❌ ReferenceError!
+    } catch (e) {
+      console.error("[2] 에러 발생:", e.message);
+    }
+    let 루미2 = "말미잘";
+
+    // 예제 3: const는 선언과 동시에 초기화 필수
+    try {
+      console.log("[3] const 변수:", 루미3); // ❌ ReferenceError!
+    } catch (e) {
+      console.error("[3] 에러 발생:", e.message);
+    }
+    const 루미3 = "문어";
+
+    // 예제 4: 함수 선언식은 호이스팅 OK!
+    sayHi(); // 👉 안녕 호빵맨 !
+    function sayHi() {
+      console.log("[4] 함수 선언식: 안녕 호빵맨 !");
+    }
+
+    // 예제 5: 함수 표현식은 호이스팅 안 됨 (변수는 undefined)
+    try {
+      sayHello(); // ❌ TypeError!
+    } catch (e) {
+      console.error("[5] 에러 발생:", e.message);
+    }
+    var sayHello = function () {
+      console.log("[5] 함수 표현식: 안녕 호빵맨 !");
+    };
+
+    // 예제 6: 대입 연산 우선순위 확인
+    let x, y, z;
+    x = y = z = "루미";
+    console.log("[6] z =", z); // "루미"
+    console.log("[6] y =", y); // "루미"
+    console.log("[6] x =", x); // "루미"
+  </script>
+</body>
+</html>

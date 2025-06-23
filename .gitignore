@@ -1,5 +1,5 @@
 # macOS 시스템 파일
-.DS_Store
+*.DS_Store
 
 # 파이썬 관련
 __pycache__/

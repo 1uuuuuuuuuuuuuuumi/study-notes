@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import Study02 from "../components/Study02";
 
 export default function Home(){
 
@@ -23,21 +24,7 @@ export default function Home(){
   
   return (
     <>
-      <div>
-        <div>
-          <label htmlFor="name">Name : </label>
-          <input type="text" name="name" onChange={handleChange} />
-        </div>
-        <div>
-          <label htmlFor="email">Email : </label>
-          <input type="email" name="email" onChange={handleChange} />
-        </div>
-        <div>
-          <label htmlFor="message">Message : </label>
-          <input type="message" name="message" onChange={handleChange} />
-        </div>
-        <button type="button" onClick={handleSubmit}>등록하기</button>
-      </div>
+      <Study02 />
     </>
   );
 }

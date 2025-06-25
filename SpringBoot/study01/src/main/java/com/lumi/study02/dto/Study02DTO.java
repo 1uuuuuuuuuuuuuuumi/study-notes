@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductDTO {
-    private String type;
-    private String name;
+public class Study02DTO {
+    private String productType;
+    private String productName;
     private Integer price;
 }

@@ -2,7 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react()
+  ],
   server:{
     proxy: {
       // 경로가 "/api" 로 시작하는 요청을 대상으로 proxy 설정
@@ -13,7 +14,11 @@ export default defineConfig({
         changeOrigin: true,
         // 요청 경로에서 '/api' 제거
         rewrite: (path) => path.replace(/^\/api/, ''),
-      }
+      },
     }
+  },
+  define: {
+    // "global"을 브라우저의 window 객체로 매핑해줘서 오류를 방지
+    global: 'window',
   }
 })

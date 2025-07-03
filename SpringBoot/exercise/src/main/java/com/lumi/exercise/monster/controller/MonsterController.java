@@ -1,6 +1,8 @@
 package com.lumi.exercise.monster.controller;
 
+import com.lumi.exercise.monster.dto.AttackDTO;
 import com.lumi.exercise.monster.dto.MonsterDTO;
+import com.lumi.exercise.monster.dto.RecoverDTO;
 import com.lumi.exercise.monster.service.MonsterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,5 +27,19 @@ public class MonsterController {
     public ResponseEntity<?> getMonsters() {
         //기능(service에서 구현)
         return ResponseEntity.ok(service.getMonsters());
+    }
+
+    @PutMapping("/attack")
+    public ResponseEntity<?> updateMonster(@RequestBody AttackDTO dto) {
+        // 기능(service에서 구현)
+        service.attackMonster(dto);
+        return ResponseEntity.ok("몬스터 hp 감소");
+    }
+
+    @PutMapping("/recover")
+    public ResponseEntity<?> recoverMonster(@RequestBody RecoverDTO dto){
+        // 기능(service에서 구현)
+        service.recoverMonster(dto);
+        return ResponseEntity.ok("몬스터 hp 회복");
     }
 }

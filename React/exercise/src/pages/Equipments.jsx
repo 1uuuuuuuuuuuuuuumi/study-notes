@@ -1,8 +1,11 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Equipments = () => {
   const [createEquipment, setCreateEquipment] = useState({});
+  const [getEquipments, setGetEquipments] = useState([]);
+
+  const [render, setRender] = useState(false);
 
   const inputEquipment = (e) => {
     const { name, value } = e.target;
@@ -17,11 +20,26 @@ const Equipments = () => {
       .post("/api/equipments", createEquipment)
       .then((res) => {
         alert(res.data);
+
+        setRender(!render);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      axios
+        .get("api/equipments")
+        .then((res) => {
+          setGetEquipments(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 1000);
+  }, [render]);
 
   return (
     <div className="equipments-container">
@@ -62,13 +80,39 @@ const Equipments = () => {
               />
             </div>
           )}
-          <button type="button" onClick={createEquipmentBtn}>⭐️ 장 비 생 성 ⭐️</button>
+          <button type="button" onClick={createEquipmentBtn}>
+            ⭐️ 장 비 생 성 ⭐️
+          </button>
         </div>
-        <div></div>
+
+        <div>
+          <h2>장비 수정</h2>
+        </div>
+
         <div></div>
       </div>
 
-      <table></table>
+      <table>
+        <thead>
+          <tr>
+            <th>장비 타입</th>
+            <th>장비 이름</th>
+            <th>장비 능력치</th>
+          </tr>
+        </thead>
+        <tbody>
+          {getEquipments.length > 0 &&
+            getEquipments.map((equipment, index) => {
+              return (
+                <tr key={index}>
+                  <td>{equipment.equipmentType}</td>
+                  <td>{equipment.equipmentName}</td>
+                  <td>{equipment.equipmentStat}</td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
     </div>
   );
 };

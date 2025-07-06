@@ -4,10 +4,7 @@ import com.lumi.exercise.equipment.dto.EquipmentDTO;
 import com.lumi.exercise.equipment.service.EquipmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,4 +20,13 @@ public class EquipmentController {
 
         return ResponseEntity.ok("장비가 생성되었습니다.");
     }
+
+    @GetMapping("")
+    public ResponseEntity<?> getEquipments() {
+        // 기능(service에서 구현)
+
+        return ResponseEntity.ok(service.getEquipments());
+    }
+
+    
 }

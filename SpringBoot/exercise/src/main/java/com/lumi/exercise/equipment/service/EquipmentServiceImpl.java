@@ -6,6 +6,8 @@ import com.lumi.exercise.equipment.repository.EquipmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EquipmentServiceImpl implements EquipmentService{
@@ -22,5 +24,10 @@ public class EquipmentServiceImpl implements EquipmentService{
                 .build();
 
         repository.save(entity);
+    }
+
+    @Override
+    public List<EquipmentDTO> getEquipments() {
+        return repository.getEquipments();
     }
 }

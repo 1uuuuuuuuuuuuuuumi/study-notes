@@ -9,4 +9,8 @@ public interface EquipmentService {
     public void createEquipment(EquipmentDTO dto);
 
     List<EquipmentDTO> getEquipments();
+
+    void updateEquipment(EquipmentDTO dto);
+
+    void deleteEquipment(String equipmentName);
 }

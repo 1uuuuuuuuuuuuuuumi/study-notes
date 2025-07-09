@@ -30,4 +30,14 @@ public class EquipmentServiceImpl implements EquipmentService{
     public List<EquipmentDTO> getEquipments() {
         return repository.getEquipments();
     }
+
+    @Override
+    public void updateEquipment(EquipmentDTO dto) {
+        repository.updateEquipmentStat(dto.getEquipmentName(), dto.getEquipmentStat());
+    }
+
+    @Override
+    public void deleteEquipment(String equipmentName) {
+        repository.deleteEquipment(equipmentName);
+    }
 }

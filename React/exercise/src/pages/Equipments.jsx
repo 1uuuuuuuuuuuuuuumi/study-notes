@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 const Equipments = () => {
   const [createEquipment, setCreateEquipment] = useState({});
   const [getEquipments, setGetEquipments] = useState([]);
+  const [updateEquipment, setUpdateEquipment] = useState({});
 
   const [render, setRender] = useState(false);
 
@@ -28,6 +29,38 @@ const Equipments = () => {
       });
   };
 
+  const updateInputEquipment = (e) => {
+    const { name, value } = e.target;
+    setUpdateEquipment({
+      ...updateEquipment,
+      [name]: value,
+    });
+  };
+
+  const updateEquipmentBtn = () => {
+    axios
+      .put("/api/equipments/update", updateEquipment)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setRender(!render);
+  };
+
+  const deleteEquipmentBtn = (equipmentName) => {
+    axios
+      .delete(`/api/equipments/delete/${equipmentName}`)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+      setRender(!render);
+  };
+
   useEffect(() => {
     setTimeout(() => {
       axios
@@ -38,7 +71,7 @@ const Equipments = () => {
         .catch((err) => {
           console.log(err);
         });
-    }, 1000);
+    }, 1500);
   }, [render]);
 
   return (
@@ -87,9 +120,39 @@ const Equipments = () => {
 
         <div>
           <h2>장비 수정</h2>
+          <div>
+            <label>장비 이름 : </label>
+            <select
+              name="equipmentName"
+              defaultValue={"none"}
+              onChange={updateInputEquipment}
+            >
+              <option value="none" disabled>
+                --선택--
+              </option>
+              {getEquipments.length > 0 &&
+                getEquipments.map((equipment, i) => {
+                  return (
+                    <option key={i} value={equipment.equipmentName}>
+                      {equipment.equipmentName}
+                    </option>
+                  );
+                })}
+            </select>
+          </div>
+          <div>
+            <label>장비 능력치 : </label>
+            <input
+              type="number"
+              name="equipmentStat"
+              onChange={updateInputEquipment}
+            />
+          </div>
+          <button type="button" onClick={updateEquipmentBtn}>
+            {" "}
+            장 비 수 정{" "}
+          </button>
         </div>
-
-        <div></div>
       </div>
 
       <table>
@@ -98,6 +161,7 @@ const Equipments = () => {
             <th>장비 타입</th>
             <th>장비 이름</th>
             <th>장비 능력치</th>
+            <th>삭제</th>
           </tr>
         </thead>
         <tbody>
@@ -108,6 +172,11 @@ const Equipments = () => {
                   <td>{equipment.equipmentType}</td>
                   <td>{equipment.equipmentName}</td>
                   <td>{equipment.equipmentStat}</td>
+                  <td>
+                    <button type="button" onClick={()=>{
+                      deleteEquipmentBtn(equipment.equipmentName);
+                    }}>❌</button>
+                  </td>
                 </tr>
               );
             })}

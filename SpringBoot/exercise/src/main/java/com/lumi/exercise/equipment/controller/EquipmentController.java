@@ -28,5 +28,19 @@ public class EquipmentController {
         return ResponseEntity.ok(service.getEquipments());
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<?> updateEquipment(@RequestBody EquipmentDTO dto) {
+        // 기능(service에서 구현)
+        service.updateEquipment(dto);
+        return ResponseEntity.ok("장비 업데이트 완료");
+    }
+
+    @DeleteMapping("/delete/{equipmentName}")
+    public ResponseEntity<?> deleteEquipment(@PathVariable("equipmentName") String equipmentName) {
+        // 기능(service에서 구현)
+        service.deleteEquipment(equipmentName);
+        return ResponseEntity.ok("장비 삭제 완료");
+    }
+
     
 }

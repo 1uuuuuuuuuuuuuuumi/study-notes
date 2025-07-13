@@ -1,4 +1,5 @@
 import axios from "axios";
+import './MonsterEquipment.css';
 import React, { useEffect, useState } from "react";
 
 const Equipments = () => {

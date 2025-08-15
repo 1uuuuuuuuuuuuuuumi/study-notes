@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👧🏻✨ 반응속도 테스트 게임 ✨👧🏻</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      text-align: center;
+      padding: 50px;
+      transition: background-color 0.2s ease;
+      background-color: #ffe4f7;
+    }
+    h1 {
+      color: #ff4fa1;
+    }
+    button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      background-color: #ffb6c1;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #ff4fa1;
+      color: white;
+    }
+    #message {
+      font-size: 1.5rem;
+      margin-top: 30px;
+      background: white;
+      display: inline-block;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <h1>👧🏻✨ 반응속도 테스트 게임 ✨👧🏻</h1>
+  <p>시작 버튼을 누르고, 화면이 <b>초록색</b>으로 변하면 바로 클릭하세요!</p>
+  <button onclick="startGame()">시작 💖</button>
+  <div id="message"></div>
+
+  <script>
+    let startTime, endTime, timer;
+    const message = document.getElementById("message");
+
+    function startGame() {
+      message.textContent = "준비...";
+      document.body.style.backgroundColor = "#ffe4f7";
+
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        document.body.style.backgroundColor = "lightgreen";
+        startTime = new Date().getTime();
+        message.textContent = "지금 클릭하세요!! 💨";
+      }, Math.random() * 3000 + 1000); // 1~4초 랜덤 대기
+    }
+
+    document.body.addEventListener("click", () => {
+      if (document.body.style.backgroundColor === "lightgreen") {
+        endTime = new Date().getTime();
+        const reactionTime = (endTime - startTime) / 1000;
+        let rank = "🐢 거북이 속도...";
+        if (reactionTime < 0.3) rank = "⚡ 치타 속도!!";
+        else if (reactionTime < 0.6) rank = "🚀 로켓 속도!";
+        else if (reactionTime < 1) rank = "🐇 토끼 속도!";
+        message.textContent = `⏱ 반응속도: ${reactionTime}초 → ${rank}`;
+        document.body.style.backgroundColor = "#ffe4f7";
+      }
+    });
+  </script>
+</body>
+</html>

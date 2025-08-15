@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>👧🏻 오늘의 운세 뽑기 ✨</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      background: linear-gradient(135deg, #ffe4f7, #d4f1ff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      color: #444;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #ff4fa1;
+    }
+    #fortune {
+      font-size: 1.5rem;
+      margin: 20px;
+      padding: 15px 20px;
+      border-radius: 15px;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      min-width: 300px;
+      transition: 0.3s;
+    }
+    #fortune:hover {
+      transform: scale(1.05);
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 25px;
+      background-color: #ff85c1;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #ff4fa1;
+    }
+  </style>
+</head>
+<body>
+  <h1>👧🏻✨ 오늘의 운세 뽑기 ✨👧🏻</h1>
+  <div id="fortune">🔮 버튼을 눌러 오늘의 운세를 확인하세요!</div>
+  <button onclick="pickFortune()">운세 뽑기 💖</button>
+
+  <script>
+    const fortunes = [
+      "🍀 오늘은 행운이 가득할 거예요!",
+      "😲 조심조심! 예상치 못한 일이 생길 수도 있어요.",
+      "💖 멋진 사람이 당신을 기다리고 있어요!",
+      "🚀 새로운 기회를 잡게 될 거예요!",
+      "🛌 휴식이 필요한 하루예요.",
+      "🌈 당신의 노력은 곧 보상을 받을 거예요!",
+      "🎯 목표를 향해 나아가기에 딱 좋은 날이에요!"
+    ];
+
+    function pickFortune() {
+      const randomIndex = Math.floor(Math.random() * fortunes.length);
+      document.getElementById("fortune").textContent = fortunes[randomIndex];
+    }
+  </script>
+</body>
+</html>

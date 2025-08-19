@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script>
+    document.write("<table>");
+    document.write("<thead>");
+    document.write("<tr>");
+      for(let i=2; i<=9; i++){
+        document.write("<th>"+i+"단"+"</th>");
+      }
+      document.write("<tr>");
+      document.write("<thead>");
+      document.write("<tbody>");
+
+      for(let i=1; i<=9; i++){
+        document.write("<tr>");
+          for(let j=2; j<=9; j++){
+            document.write("<td>"+j+"*"+i+"="+(i*j)+"</td>");
+          }
+          document.write("</tr>");
+      }
+      document.write("</tbody>");
+      document.write("</table>");
+  </script>
+</head>
+<body>
+  
+</body>
+</html>

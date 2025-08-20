@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>👧🏻 드래그로 정렬되는 TODO (저장됨)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #f7f7fb;
+        --card: #fff;
+        --ink: #222;
+        --muted: #777;
+        --accent: #6a5acd;
+        --accent2: #09c372;
+        --danger: #ff4d4f;
+        --border: #ececf1;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+      }
+      .app {
+        width: min(760px, 100%);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      header h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      form.input-bar {
+        display: flex;
+        gap: 8px;
+        margin: 10px 0 16px;
+        background: #fafafe;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 8px;
+      }
+      .input-bar input {
+        flex: 1;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        padding: 8px;
+        font-size: 14px;
+      }
+      .input-bar button {
+        border: 0;
+        background: var(--accent);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .filters button {
+        background: #fff;
+        border: 1px solid var(--border);
+        padding: 6px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .filters button[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      ul.list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 8px;
+      }
+      .item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+        padding: 10px 12px;
+      }
+      .item.dragging {
+        opacity: 0.5;
+      }
+      .item .text {
+        white-space: pre-wrap;
+      }
+      .item.done .text {
+        color: var(--muted);
+        text-decoration: line-through;
+      }
+      .item .grip {
+        cursor: grab;
+        user-select: none;
+        padding: 4px 8px;
+        border-radius: 8px;
+        border: 1px dashed var(--border);
+        color: var(--muted);
+      }
+      .item .actions {
+        display: flex;
+        gap: 6px;
+      }
+      .item .btn {
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .item .btn.done {
+        border-color: var(--accent2);
+        color: var(--accent2);
+      }
+      .item .btn.delete {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .empty {
+        text-align: center;
+        color: var(--muted);
+        padding: 24px;
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        background: #fafafe;
+      }
+      footer {
+        margin-top: 14px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+      }
+      kbd {
+        background: #f2f2f6;
+        border: 1px solid #e6e6ea;
+        border-bottom-width: 2px;
+        border-radius: 6px;
+        padding: 0 6px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app" role="application" aria-label="드래그로 정렬되는 TODO 앱">
+      <header>
+        <h1>👧🏻 TODO — 드래그해서 순서 바꾸기</h1>
+        <span class="muted">자동 저장됨</span>
+      </header>
+
+      <form class="input-bar" id="todoForm" autocomplete="off">
+        <input
+          id="todoInput"
+          type="text"
+          placeholder="할 일을 입력하고 Enter! (Ctrl+Enter: 줄바꿈 방지, Esc: 비우기)"
+          aria-label="할 일 입력"
+        />
+        <button type="submit" aria-label="추가">추가</button>
+      </form>
+
+      <div class="filters" id="filters" role="tablist" aria-label="필터">
+        <button role="tab" data-filter="all" aria-pressed="true">전체</button>
+        <button role="tab" data-filter="active" aria-pressed="false">
+          진행중
+        </button>
+        <button role="tab" data-filter="done" aria-pressed="false">완료</button>
+      </div>
+
+      <ul class="list" id="list" aria-live="polite"></ul>
+      <div class="empty" id="empty" hidden>
+        할 일이 비어 있어요. 새로운 할 일을 추가해보세요 ✨
+      </div>
+
+      <footer>
+        <div id="count">0개</div>
+        <div class="muted">Tip: 마우스로 끌어 정렬 • 체크로 완료</div>
+      </footer>
+    </div>
+
+    <script>
+      (() => {
+        // ----- 상태 & 스토리지 ------------------------------------------------------
+        const STORAGE_KEY = "todos-dnd-v1";
+        /** @type {{id:string, text:string, done:boolean}[]} */
+        let state = load() || [
+          { id: uid(), text: "이 항목을 드래그해서 순서 바꿔봐!", done: false },
+          { id: uid(), text: "체크하면 완료 처리돼요.", done: false },
+          { id: uid(), text: "필터(전체/진행/완료)도 눌러보기~", done: false },
+        ];
+        let currentFilter = "all"; // all | active | done
+
+        // ----- 엘리먼트 ------------------------------------------------------------
+        const $list = document.getElementById("list");
+        const $empty = document.getElementById("empty");
+        const $form = document.getElementById("todoForm");
+        const $input = document.getElementById("todoInput");
+        const $filters = document.getElementById("filters");
+        const $count = document.getElementById("count");
+
+        // ----- 유틸 ----------------------------------------------------------------
+        function uid() {
+          return Math.random().toString(36).slice(2, 10);
+        }
+        function save() {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+        function load() {
+          try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+          } catch {
+            return null;
+          }
+        }
+        const debounce = (fn, ms = 150) => {
+          let t;
+          return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...args), ms);
+          };
+        };
+
+        // ----- 렌더 ----------------------------------------------------------------
+        function getFiltered() {
+          if (currentFilter === "active") return state.filter((t) => !t.done);
+          if (currentFilter === "done") return state.filter((t) => t.done);
+          return state.slice();
+        }
+
+        function render() {
+          const items = getFiltered();
+          $list.innerHTML = "";
+          if (items.length === 0) {
+            $empty.hidden = false;
+          } else {
+            $empty.hidden = true;
+            const frag = document.createDocumentFragment();
+            for (const t of items) {
+              frag.appendChild(renderItem(t));
+            }
+            $list.appendChild(frag);
+          }
+          $count.textContent = `${state.length}개`;
+          saveDebounced();
+        }
+
+        function renderItem(t) {
+          const li = document.createElement("li");
+          li.className = `item${t.done ? " done" : ""}`;
+          li.draggable = true;
+          li.dataset.id = t.id;
+          li.setAttribute("aria-grabbed", "false");
+
+          // 체크박스
+          const lab = document.createElement("label");
+          lab.style.display = "flex";
+          lab.style.alignItems = "center";
+          lab.style.gap = "8px";
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = t.done;
+          cb.setAttribute("aria-label", "완료 표시");
+          const text = document.createElement("div");
+          text.className = "text";
+          text.textContent = t.text;
+          lab.append(cb, text);
+
+          // 핸들
+          const grip = document.createElement("div");
+          grip.className = "grip";
+          grip.textContent = "⋮⋮";
+
+          // 액션
+          const actions = document.createElement("div");
+          actions.className = "actions";
+          const btnDone = document.createElement("button");
+          btnDone.className = "btn done";
+          btnDone.textContent = "완료";
+          btnDone.type = "button";
+          const btnDel = document.createElement("button");
+          btnDel.className = "btn delete";
+          btnDel.textContent = "삭제";
+          btnDel.type = "button";
+          actions.append(btnDone, btnDel);
+
+          li.append(grip, lab, actions);
+          return li;
+        }
+
+        const saveDebounced = debounce(save, 120);
+
+        // ----- 입력 ----------------------------------------------------------------
+        $form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const text = $input.value.trim();
+          if (!text) return;
+          state.unshift({ id: uid(), text, done: false });
+          $input.value = "";
+          render();
+        });
+
+        // UX: Ctrl+Enter로 새 줄 방지/빠른 추가(엔터는 기본 submit)
+        $input.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            $input.value = "";
+          }
+        });
+
+        // ----- 필터 ----------------------------------------------------------------
+        $filters.addEventListener("click", (e) => {
+          const btn = e.target.closest("button[data-filter]");
+          if (!btn) return;
+          currentFilter = btn.dataset.filter;
+          for (const b of $filters.querySelectorAll("button"))
+            b.setAttribute("aria-pressed", "false");
+          btn.setAttribute("aria-pressed", "true");
+          render();
+        });
+
+        // ----- 이벤트 위임: 체크/삭제 ----------------------------------------------
+        $list.addEventListener("click", (e) => {
+          const li = e.target.closest(".item");
+          if (!li) return;
+          const id = li.dataset.id;
+          if (
+            e.target.matches("input[type=checkbox]") ||
+            e.target.closest(".btn.done")
+          ) {
+            toggleDone(id);
+          } else if (e.target.closest(".btn.delete")) {
+            del(id);
+          }
+        });
+
+        function toggleDone(id) {
+          const t = state.find((t) => t.id === id);
+          if (!t) return;
+          t.done = !t.done;
+          render();
+        }
+        function del(id) {
+          state = state.filter((t) => t.id !== id);
+          render();
+        }
+
+        // ----- Drag & Drop 정렬 ----------------------------------------------------
+        let draggedId = null;
+
+        $list.addEventListener("dragstart", (e) => {
+          const li = e.target.closest(".item");
+          if (!li) return;
+          draggedId = li.dataset.id;
+          li.classList.add("dragging");
+          li.setAttribute("aria-grabbed", "true");
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text/plain", draggedId);
+        });
+
+        $list.addEventListener("dragend", (e) => {
+          const li = e.target.closest(".item");
+          if (li) {
+            li.classList.remove("dragging");
+            li.setAttribute("aria-grabbed", "false");
+          }
+        });
+
+        $list.addEventListener("dragover", (e) => {
+          e.preventDefault(); // drop 허용
+          const after = getDragAfterElement($list, e.clientY);
+          const draggingEl = $list.querySelector(".item.dragging");
+          if (!draggingEl) return;
+          if (after == null) {
+            $list.appendChild(draggingEl);
+          } else {
+            $list.insertBefore(draggingEl, after);
+          }
+        });
+
+        $list.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const order = [...$list.querySelectorAll(".item")].map(
+            (li) => li.dataset.id
+          );
+          // 현재 필터 상태에서 보이는 순서만 바뀌었을 수 있으니, 전체 state를 새 순서로 재정렬
+          // 1) 보이는 아이템 순서를 우선으로, 2) 보이지 않는 아이템은 기존 순서를 유지
+          const visibleIds = new Set(order);
+          const visible = state.filter((t) => visibleIds.has(t.id));
+          const invisible = state.filter((t) => !visibleIds.has(t.id));
+          // order 순서대로 visible 재배치
+          const reorderedVisible = order
+            .map((id) => visible.find((t) => t.id === id))
+            .filter(Boolean);
+          state = [...reorderedVisible, ...invisible];
+          saveDebounced();
+          render(); // 새로운 순서를 반영
+        });
+
+        function getDragAfterElement(container, y) {
+          const els = [...container.querySelectorAll(".item:not(.dragging)")];
+          let closest = { offset: Number.NEGATIVE_INFINITY, element: null };
+          for (const el of els) {
+            const box = el.getBoundingClientRect();
+            const offset = y - (box.top + box.height / 2);
+            if (offset < 0 && offset > closest.offset) {
+              closest = { offset, element: el };
+            }
+          }
+          return closest.element;
+        }
+
+        // ----- 초기 렌더 -----------------------------------------------------------
+        render();
+      })();
+    </script>
+  </body>
+</html>

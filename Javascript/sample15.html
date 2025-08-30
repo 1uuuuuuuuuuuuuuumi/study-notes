@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🎲 랜덤 주사위 굴리기</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+      background: linear-gradient(135deg, #ffe4f7, #d4f1ff);
+    }
+    h1 {
+      color: #ff4fa1;
+    }
+    #dice {
+      font-size: 80px;
+      margin: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      background: #ffcc80;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ffb300;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>👧🏻 랜덤 주사위 굴리기 🎲</h1>
+  <div id="dice">🎲</div>
+  <button onclick="rollDice()">주사위 굴리기!</button>
+
+  <script>
+    function rollDice() {
+      const num = Math.floor(Math.random() * 6) + 1; // 1~6 사이 랜덤 숫자
+      document.getElementById("dice").innerText = "🎲 " + num;
+    }
+  </script>
+</body>
+</html>

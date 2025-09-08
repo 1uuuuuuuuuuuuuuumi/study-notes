@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🌸 웹 쇼핑몰 시안 🌸</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f9f9f9;
+    }
+
+    /* 헤더 */
+    header {
+      background: #ff6f61;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* 컨테이너 */
+    .container {
+      display: flex;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    /* 상품 이미지 */
+    .product-image {
+      flex: 1;
+      padding: 20px;
+    }
+    .product-image img {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    /* 상품 정보 */
+    .product-info {
+      flex: 2;
+      padding: 20px;
+    }
+    .product-info h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .price {
+      font-size: 1.5rem;
+      color: #ff6f61;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    .desc {
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+
+    /* 버튼 */
+    .btns {
+      display: flex;
+      gap: 15px;
+    }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .buy {
+      background: #ff6f61;
+      color: white;
+    }
+    .cart {
+      background: #ffe082;
+      color: #333;
+    }
+
+    /* 푸터 */
+    footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 헤더 -->
+  <header>
+    <h1>루미 쇼핑몰 👧🏻🛒</h1>
+    <nav>
+      <a href="#">홈</a>
+      <a href="#">베스트</a>
+      <a href="#">신상품</a>
+      <a href="#">고객센터</a>
+    </nav>
+  </header>
+
+  <!-- 메인 컨테이너 -->
+  <div class="container">
+    <!-- 상품 이미지 -->
+    <div class="product-image">
+      <img src="https://via.placeholder.com/400x400" alt="상품 이미지">
+    </div>
+
+    <!-- 상품 정보 -->
+    <div class="product-info">
+      <h2>✨ 한정판 초코렛 ✨</h2>
+      <p class="price">₩ 9,900</p>
+      <p class="desc">
+        🍫 세상에서 가장 달콤한 초콜릿!  
+        💝 선물용으로도 딱!  
+        🌟 오늘 주문하면 내일 도착 🚚
+      </p>
+
+      <div class="btns">
+        <button class="buy">바로구매</button>
+        <button class="cart">장바구니</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer>
+    © 2025 루미 쇼핑몰 👧🏻 All rights reserved.
+  </footer>
+</body>
+</html>

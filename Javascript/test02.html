@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🌸 루미 쇼핑몰 메인 🌸</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f9f9f9;
+    }
+
+    /* 헤더 */
+    header {
+      background: #ff6f61;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* 메인 배너 */
+    .banner {
+      background: url('https://via.placeholder.com/1200x300/ffccbc/333?text=루미+쇼핑몰+메인배너') no-repeat center/cover;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    /* 상품 리스트 */
+    .product-list {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    /* 상품 카드 */
+    .product {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .product:hover {
+      transform: translateY(-5px);
+    }
+    .product img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .product-info {
+      padding: 15px;
+    }
+    .product-info h3 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    .price {
+      font-weight: bold;
+      color: #ff6f61;
+      margin-bottom: 10px;
+    }
+    .btns {
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .buy {
+      background: #ff6f61;
+      color: white;
+    }
+    .cart {
+      background: #ffe082;
+      color: #333;
+    }
+
+    /* 푸터 */
+    footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 헤더 -->
+  <header>
+    <h1>루미 쇼핑몰 👧🏻🛒</h1>
+    <nav>
+      <a href="#">홈</a>
+      <a href="#">베스트</a>
+      <a href="#">신상품</a>
+      <a href="#">고객센터</a>
+    </nav>
+  </header>
+
+  <!-- 메인 배너 -->
+  <div class="banner">
+    ✨ 오늘의 특가! 지금 바로 쇼핑하러 가기 ✨
+  </div>
+
+  <!-- 상품 리스트 -->
+  <div class="product-list">
+    <!-- 상품 1 -->
+    <div class="product">
+      <img src="https://via.placeholder.com/300x200" alt="상품1">
+      <div class="product-info">
+        <h3>한정판 초콜릿</h3>
+        <p class="price">₩ 9,900</p>
+        <div class="btns">
+          <button class="buy">바로구매</button>
+          <button class="cart">장바구니</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상품 2 -->
+    <div class="product">
+      <img src="https://via.placeholder.com/300x200" alt="상품2">
+      <div class="product-info">
+        <h3>딸기 머그컵</h3>
+        <p class="price">₩ 12,500</p>
+        <div class="btns">
+          <button class="buy">바로구매</button>
+          <button class="cart">장바구니</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상품 3 -->
+    <div class="product">
+      <img src="https://via.placeholder.com/300x200" alt="상품3">
+      <div class="product-info">
+        <h3>귀여운 키링</h3>
+        <p class="price">₩ 5,000</p>
+        <div class="btns">
+          <button class="buy">바로구매</button>
+          <button class="cart">장바구니</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상품 4 -->
+    <div class="product">
+      <img src="https://via.placeholder.com/300x200" alt="상품4">
+      <div class="product-info">
+        <h3>루미 한정판 티셔츠</h3>
+        <p class="price">₩ 29,000</p>
+        <div class="btns">
+          <button class="buy">바로구매</button>
+          <button class="cart">장바구니</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer>
+    © 2025 루미 쇼핑몰 👧🏻 All rights reserved.
+  </footer>
+</body>
+</html>

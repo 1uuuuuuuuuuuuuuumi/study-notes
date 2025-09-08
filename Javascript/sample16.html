@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>👧🏻 랜덤 배경색 바꾸기 🎨✨</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      text-align: center;
+      padding: 50px;
+      transition: background-color 0.5s ease;
+    }
+    h1 {
+      color: #444;
+    }
+    button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 12px;
+      background: #ffcc80;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ff8a65;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>👧🏻✨ 랜덤 배경색 바꾸기 ✨👧🏻</h1>
+  <button onclick="changeColor()">배경 바꾸기 💫</button>
+
+  <script>
+    function changeColor() {
+      const colors = ["#ffadad","#ffd6a5","#fdffb6","#caffbf","#9bf6ff","#a0c4ff","#bdb2ff","#ffc6ff"];
+      const randomIndex = Math.floor(Math.random() * colors.length);
+      document.body.style.backgroundColor = colors[randomIndex];
+    }
+  </script>
+</body>
+</html>

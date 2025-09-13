@@ -1,0 +1,383 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>장바구니 | Stationery Shop</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+  /* ===== 화이트+옐로우 카드형 폼 테마 (요청한 톤 그대로) ===== */
+  :root {
+    --bg1:#fff8e1; --bg2:#ffecb3;        /* 배경 그라데이션 */
+    --brown:#5d4037;
+    --y:#fdd835; --yHover:#fbc02d;        /* 버튼 톤 */
+    --line:#ffcc80;
+    --shadow: 0 6px 15px rgba(0,0,0,0.1);
+  }
+  body{
+    margin:0;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    font-family: "Pretendard","Apple SD Gothic Neo", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color:#333;
+  }
+  .container{
+    max-width: 1100px;
+    margin: 40px auto;
+    background:#fff;
+    border-radius:15px;
+    box-shadow:var(--shadow);
+    padding:30px;
+  }
+  .breadcrumb{font-size:14px; color:#7b6a58; margin-bottom:16px}
+  .breadcrumb a{color:#7b6a58; text-decoration:none}
+  h1{
+    margin:0 0 6px 0; text-align:center;
+    font-size:28px; color:#5d4037;
+  }
+  .sub{ text-align:center; color:#8d6e63; margin-bottom:24px; }
+
+  /* 테이블 */
+  .cart-table{ width:100%; border-collapse:collapse; }
+  .cart-table th, .cart-table td{
+    border-bottom:1px solid #f3e5ab;
+    padding:14px 10px;
+    vertical-align:middle;
+  }
+  .cart-table th{
+    background:#fffaf0; color:#5d4037; font-weight:700;
+  }
+  .col-check{ width:44px; text-align:center; }
+  .col-img{ width:84px; }
+  .prod{
+    display:flex; align-items:center; gap:12px;
+  }
+  .prod img{
+    width:64px; height:64px; object-fit:cover; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.06);
+  }
+  .prod .name{ font-weight:600 }
+  .prod .opts{ font-size:12px; color:#8d6e63 }
+
+  /* 수량 */
+  .qty{
+    display:inline-flex; align-items:center; gap:6px; 
+    border:1px solid var(--line); border-radius:10px; padding:4px 8px;
+  }
+  .qty input{
+    width:44px; text-align:center; border:none; outline:none; font-weight:600;
+  }
+  .btn{
+    border:none; border-radius:8px; padding:8px 14px; font-weight:700; cursor:pointer;
+    background:var(--y); color:#5d4037; transition:.2s; box-shadow:0 2px 6px rgba(0,0,0,.08);
+  }
+  .btn:hover{ background:var(--yHover); color:#fff; }
+  .btn-ghost{
+    background:#f5f5f5; color:#5d4037;
+  }
+  .btn-ghost:hover{ background:#e0e0e0; color:#333; }
+
+  .actions{
+    display:flex; gap:8px; justify-content:flex-end; margin:14px 0 22px;
+  }
+
+  /* 합계 박스 */
+  .summary{
+    margin-top:24px; display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px;
+  }
+  .card{
+    background:#fff; border:1px solid #ffe082; border-radius:15px; padding:18px;
+    box-shadow:var(--shadow);
+  }
+  .card .label{ color:#795548; font-size:13px; }
+  .card .value{ font-size:20px; font-weight:800; margin-top:6px; }
+
+  .checkout{
+    display:flex; gap:10px; justify-content:flex-end; margin-top:16px;
+  }
+  .price{ font-weight:700 }
+  .text-right{ text-align:right }
+
+  /* 모바일 */
+  @media (max-width: 720px) {
+    .prod .opts{ display:none }
+    .summary{ grid-template-columns:1fr 1fr }
+    .actions, .checkout{ flex-direction:column; align-items:stretch }
+  }
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="breadcrumb">
+    <a href="/main.do">홈</a> <span>›</span> <strong>장바구니</strong>
+  </div>
+
+  <h1>👧🏻 장바구니</h1>
+  <div class="sub">담긴 상품은 <b>7일</b>간 보관돼요. 결제 전까지 재고/가격이 변동될 수 있어요.</div>
+
+  <!-- 상단 툴바 -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    <label style="display:flex; align-items:center; gap:8px; color:#5d4037;">
+      <input type="checkbox" id="headCheck"> 전체선택
+    </label>
+    <div class="actions">
+      <button class="btn-ghost btn" id="btnDelSel">선택삭제</button>
+      <button class="btn-ghost btn" id="btnWishSel">선택관심</button>
+    </div>
+  </div>
+
+  <!-- 장바구니 테이블 -->
+  <table class="cart-table">
+    <thead>
+    <tr>
+      <th class="col-check"></th>
+      <th class="col-img"></th>
+      <th>상품정보</th>
+      <th class="text-right">가격</th>
+      <th>수량</th>
+      <th class="text-right">합계</th>
+      <th class="text-right">관리</th>
+    </tr>
+    </thead>
+    <tbody id="cart-body">
+      <!-- JS 렌더링 -->
+    </tbody>
+  </table>
+
+  <!-- 하단 버튼 -->
+  <div class="actions">
+    <button class="btn-ghost btn" id="btnDelSel2">선택삭제</button>
+    <button class="btn-ghost btn" id="btnWishSel2">선택관심</button>
+  </div>
+
+  <!-- 합계 -->
+  <div class="summary">
+    <div class="card">
+      <div class="label">상품금액</div>
+      <div class="value" id="sum-products">₩ 0</div>
+    </div>
+    <div class="card">
+      <div class="label">할인금액</div>
+      <div class="value" id="sum-discount">₩ 0</div>
+    </div>
+    <div class="card">
+      <div class="label">배송비</div>
+      <div class="value" id="sum-shipping">₩ 0</div>
+    </div>
+    <div class="card">
+      <div class="label">결제예정금액</div>
+      <div class="value" id="sum-total">₩ 0</div>
+    </div>
+  </div>
+
+  <div class="checkout">
+    <button class="btn" id="btnOrderSel">선택상품 주문</button>
+    <button class="btn" id="btnOrderAll">전체상품 주문</button>
+  </div>
+</div>
+
+<script>
+  /* ---------------------------
+     유틸
+  ----------------------------*/
+  const fmt = (n)=> "₩ " + (Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+  const clampQty = (q)=> Math.max(1, parseInt(q||1,10));
+
+  /* ---------------------------
+     더미 데이터 (백엔드 연동 전 테스트용)
+     - price: 현재가(원)
+     - discount: 개당 할인액(원)
+  ----------------------------*/
+  let cart = [
+    { id: 101, name: "젤펜 0.5mm (블랙)", opts: "옵션: 0.5 / 블랙", price: 1200, discount: 0, qty: 2, img:"https://picsum.photos/seed/pen/80" , checked:true },
+    { id: 102, name: "A5 도트 노트",     opts: "옵션: A5 / 80매",   price: 3500, discount: 300, qty: 1, img:"https://picsum.photos/seed/note/80", checked:true },
+    { id: 103, name: "마커 6색 세트",     opts: "옵션: 파스텔",      price: 7800, discount: 800, qty: 1, img:"https://picsum.photos/seed/marker/80", checked:false },
+  ];
+
+  /* ---------------------------
+     렌더링
+  ----------------------------*/
+  function render(){
+    const $tbody = $("#cart-body").empty();
+    cart.forEach(item=>{
+      const line = (item.price - item.discount) * item.qty;
+      const $tr = $(`
+        <tr data-id="${item.id}">
+          <td class="col-check">
+            <input type="checkbox" class="rowCheck" ${item.checked?'checked':''}>
+          </td>
+          <td class="col-img">
+            <img src="${item.img}" alt="">
+          </td>
+          <td>
+            <div class="prod">
+              <div class="meta">
+                <div class="name">${escapeHtml(item.name)}</div>
+                <div class="opts">${escapeHtml(item.opts||'')}</div>
+              </div>
+            </div>
+          </td>
+          <td class="text-right">
+            <div>상품가: <span class="price">${fmt(item.price)}</span></div>
+            ${item.discount>0 ? `<div style="color:#d32f2f">할인: −${fmt(item.discount)}</div>`:''}
+          </td>
+          <td>
+            <div class="qty">
+              <button class="btn-ghost btn btnMinus" aria-label="수량감소">−</button>
+              <input type="number" class="qtyInput" min="1" value="${item.qty}">
+              <button class="btn-ghost btn btnPlus" aria-label="수량증가">＋</button>
+            </div>
+          </td>
+          <td class="text-right">
+            <div class="price lineTotal">${fmt(line)}</div>
+          </td>
+          <td class="text-right">
+            <button class="btn-ghost btn btnDel" title="삭제">삭제</button>
+          </td>
+        </tr>
+      `);
+      $tbody.append($tr);
+    });
+    syncHeadCheck();
+    recalc();
+  }
+
+  /* ---------------------------
+     합계 계산
+     - 배송비 정책: 선택상품 합계가 30,000원 미만이면 3,000원, 이상이면 0원 (예시)
+  ----------------------------*/
+  function recalc(){
+    let sumProducts=0, sumDiscount=0, sumLine=0, selectedCount=0;
+    cart.forEach(it=>{
+      if(!it.checked) return;
+      selectedCount++;
+      sumProducts += (it.price * it.qty);
+      sumDiscount += (it.discount * it.qty);
+    });
+    sumLine = sumProducts - sumDiscount;
+    const shipping = sumLine>0 && sumLine<30000 ? 3000 : 0;
+    const grand = sumLine + shipping;
+
+    $("#sum-products").text(fmt(sumProducts));
+    $("#sum-discount").text("− " + fmt(sumDiscount).replace("₩ ",""));
+    $("#sum-shipping").text(fmt(shipping));
+    $("#sum-total").text(fmt(grand));
+  }
+
+  function syncHeadCheck(){
+    const total = cart.length;
+    const checked = cart.filter(i=>i.checked).length;
+    $("#headCheck").prop("checked", total>0 && total===checked);
+  }
+
+  /* ---------------------------
+     이벤트
+  ----------------------------*/
+  $(document).on("change","#headCheck",function(){
+    const on = $(this).is(":checked");
+    cart = cart.map(it=>({...it,checked:on}));
+    $(".rowCheck").prop("checked", on);
+    recalc();
+  });
+
+  $(document).on("change",".rowCheck",function(){
+    const id = rowId(this);
+    const on = $(this).is(":checked");
+    const it = cart.find(i=>i.id===id);
+    if(it){ it.checked = on; }
+    syncHeadCheck();
+    recalc();
+  });
+
+  $(document).on("click",".btnPlus",function(){
+    const id = rowId(this);
+    const it = cart.find(i=>i.id===id);
+    it.qty = clampQty(it.qty+1);
+    updateRow(id);
+  });
+
+  $(document).on("click",".btnMinus",function(){
+    const id = rowId(this);
+    const it = cart.find(i=>i.id===id);
+    it.qty = clampQty(it.qty-1);
+    updateRow(id);
+  });
+
+  $(document).on("input change",".qtyInput",function(){
+    const id = rowId(this);
+    const it = cart.find(i=>i.id===id);
+    it.qty = clampQty($(this).val());
+    updateRow(id);
+  });
+
+  $(document).on("click",".btnDel",function(){
+    const id = rowId(this);
+    cart = cart.filter(i=>i.id!==id);
+    render();
+    // TODO: 실제 서버 삭제연동
+    // $.post("/cart/delete.do", { cartId:id }, function(){ ... });
+  });
+
+  $("#btnDelSel, #btnDelSel2").on("click", function(){
+    const before = cart.length;
+    cart = cart.filter(i=>!i.checked?true:false); // 선택된 것만 제거
+    if(cart.length===before){
+      alert("선택된 상품이 없어요.");
+      return;
+    }
+    render();
+    // TODO: 서버에 일괄삭제 요청
+    // $.ajax({ url:"/cart/deleteSelected.do", type:"post", data:{ ids:selectedIds() } })
+  });
+
+  $("#btnWishSel, #btnWishSel2").on("click", function(){
+    const ids = selectedIds();
+    if(ids.length===0){ alert("선택된 상품이 없어요."); return; }
+    alert("선택상품을 관심목록에 담았어요! (데모)");
+    // TODO: 서버 관심등록
+    // $.post("/wish/addSelected.do", { ids }, ()=>{ ... });
+  });
+
+  $("#btnOrderSel").on("click", function(){
+    const ids = selectedIds();
+    if(ids.length===0){ alert("선택된 상품이 없어요."); return; }
+    // 데모: 쿼리스트링로 이동
+    location.href = "/order/checkout.do?ids=" + encodeURIComponent(ids.join(","));
+    // 실제로는 POST로 선택목록 서버 세션에 담고 페이지 이동 권장
+  });
+
+  $("#btnOrderAll").on("click", function(){
+    if(cart.length===0){ alert("장바구니가 비었어요."); return; }
+    location.href = "/order/checkout.do?all=1";
+  });
+
+  /* ---------------------------
+     행/선택 헬퍼
+  ----------------------------*/
+  function rowId(el){
+    return parseInt($(el).closest("tr").data("id"),10);
+  }
+  function selectedIds(){
+    return cart.filter(i=>i.checked).map(i=>i.id);
+  }
+  function updateRow(id){
+    const it = cart.find(i=>i.id===id);
+    const $tr = $(`tr[data-id="${id}"]`);
+    $tr.find(".qtyInput").val(it.qty);
+    const line = (it.price - it.discount) * it.qty;
+    $tr.find(".lineTotal").text(fmt(line));
+    recalc();
+
+    // TODO: 서버에 수량 변경 반영
+    // $.post("/cart/updateQty.do", { cartId:id, qty:it.qty });
+  }
+
+  function escapeHtml(str=""){
+    return String(str).replace(/[&<>"']/g, s=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[s]));
+  }
+
+  /* 초기 렌더 */
+  $(function(){ render(); });
+</script>
+</body>
+</html>

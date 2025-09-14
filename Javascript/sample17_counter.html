@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>👧🏻 카운터 앱 ✨</title>
+    <style>
+      body {
+        font-family: "Comic Sans MS", cursive;
+        text-align: center;
+        background: linear-gradient(135deg, #ffe4f7, #d4f1ff);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .counter-box {
+        background: #fff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 20px;
+        color: #ff4fa1;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 10px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .plus {
+        background: #4caf50;
+        color: #fff;
+      }
+      .minus {
+        background: #f44336;
+        color: #fff;
+      }
+      .reset {
+        background: #2196f3;
+        color: #fff;
+      }
+      button:hover {
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="counter-box">
+      <h1 id="count">0</h1>
+      <button class="plus" onclick="increase()">➕ 증가</button>
+      <button class="minus" onclick="decrease()">➖ 감소</button>
+      <button class="reset" onclick="reset()">🔄 리셋</button>
+    </div>
+
+    <script>
+      let count = 0;
+
+      function increase() {
+        count++;
+        document.getElementById("count").innerText = count;
+      }
+
+      function decrease() {
+        count--;
+        document.getElementById("count").innerText = count;
+      }
+
+      function reset() {
+        count = 0;
+        document.getElementById("count").innerText = count;
+      }
+    </script>
+  </body>
+</html>

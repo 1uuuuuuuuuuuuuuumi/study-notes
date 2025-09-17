@@ -1,0 +1,147 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>주문 페이지</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    color: #333;
+  }
+  .order-container {
+    width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+  }
+  h2 { color: #DC0630; }
+  .section { margin-bottom: 20px; }
+  label { font-weight: bold; display: block; margin-bottom: 5px; }
+  input, select {
+    width: 100%; padding: 8px; margin-bottom: 10px;
+    border: 1px solid #ccc; border-radius: 5px;
+  }
+  .summary {
+    position: sticky; top: 20px;
+    padding: 15px; background: #f9f9f9;
+    border: 1px solid #ddd; border-radius: 10px;
+  }
+  button {
+    background: #DC0630; color: white;
+    padding: 12px 20px; border: none;
+    border-radius: 8px; font-weight: bold;
+    cursor: pointer;
+  }
+  button:hover { background: #b40428; }
+</style>
+</head>
+<body>
+  <div class="order-container">
+    <h2>🛒 주문서 작성</h2>
+
+    <!-- 배송지 입력 -->
+    <div class="section">
+      <label>받는 사람</label>
+      <input type="text" id="receiver">
+
+      <label>주소</label>
+      <input type="text" id="address">
+
+      <label>연락처</label>
+      <input type="text" id="phone">
+    </div>
+
+    <!-- 결제 수단 -->
+    <div class="section">
+      <label>결제 수단</label>
+      <select id="paymentMethod">
+        <option value="card">💳 신용/체크카드</option>
+        <option value="bank">🏦 계좌이체</option>
+        <option value="easy">⚡ 간편결제</option>
+        <option value="point">⭐ 포인트</option>
+      </select>
+    </div>
+
+    <!-- 주문 상품 -->
+    <div class="section">
+      <h3>상품 목록</h3>
+      <table border="1" width="100%">
+        <tr><th>상품명</th><th>수량</th><th>가격</th></tr>
+        <tr>
+          <td>샤프</td>
+          <td><input type="number" class="qty" value="1" min="1" data-price="2000"></td>
+          <td class="subtotal">2000</td>
+        </tr>
+        <tr>
+          <td>노트</td>
+          <td><input type="number" class="qty" value="2" min="1" data-price="1500"></td>
+          <td class="subtotal">3000</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 결제 요약 -->
+    <div class="summary">
+      <h3>결제정보</h3>
+      <p>총 상품금액: <span id="totalPrice">5000</span>원</p>
+      <button id="btnOrder">✅ 주문하기</button>
+    </div>
+  </div>
+
+<script>
+  // 수량 변경 시 합계 갱신
+  $(document).on("input", ".qty", function() {
+    var price = $(this).data("price");   // data-price 속성값
+    var qty = $(this).val();
+    var subtotal = price * qty;
+
+    // 소계 갱신
+    $(this).closest("tr").find(".subtotal").text(subtotal);
+
+    // 총액 다시 계산
+    updateTotal();
+  });
+
+  // 총액 계산 함수
+  function updateTotal(){
+    var total = 0;
+    $(".subtotal").each(function(){
+      total += Number($(this).text());
+    });
+    $("#totalPrice").text(total);
+  }
+
+  // 주문하기 버튼
+  $("#btnOrder").click(function(){
+    var receiver = $("#receiver").val();
+    var address = $("#address").val();
+    var phone = $("#phone").val();
+    var payment = $("#paymentMethod").val();
+    var total = $("#totalPrice").text();
+
+    if(!receiver || !address || !phone){
+      alert("배송지 정보를 모두 입력해주세요!");
+      return;
+    }
+
+    alert("주문 완료!\n받는 사람: " + receiver + "\n총 결제금액: " + total + "원\n결제 수단: " + payment);
+
+    // 실제 환경에서는 AJAX로 서버에 주문정보 전달
+    /*
+    $.ajax({
+      url: "/orderInsert.do",
+      type: "post",
+      data: {receiver, address, phone, payment, total},
+      success: function(res){ alert("주문 성공!"); },
+      error: function(){ alert("주문 실패!"); }
+    });
+    */
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>주문서 - 정적 샘플</title>
+  <style>
+    :root{ --main:#DC0630; --white:#fff; --muted:#666; }
+    body{ font-family: -apple-system, 'Noto Sans KR', 'Malgun Gothic', sans-serif; background:#fff; color:#333; padding:24px; }
+    .wrap{ max-width:1100px; margin:0 auto; display:flex; gap:24px; }
+    .order-left{ flex:1; background:var(--white); padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    .order-left h2{ color:var(--main); margin:0 0 12px 0; }
+    .item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid #f2f2f2; align-items:center; }
+    .item img{ width:84px; height:84px; object-fit:cover; border-radius:8px; background:#f8f8f8; }
+    .meta{ flex:1; }
+    .name{ font-weight:700; margin-bottom:6px; }
+    .option{ color:#777; font-size:13px; margin-bottom:8px; }
+    .qty-control{ display:flex; align-items:center; gap:8px; }
+    .qty-control button{ width:28px; height:28px; border-radius:6px; border:1px solid #eee; background:#fafafa; cursor:pointer; }
+    .qty-control input{ width:46px; text-align:center; border:1px solid #eee; border-radius:6px; padding:6px; }
+    .price{ width:140px; text-align:right; font-weight:700; }
+    .order-right{ width:360px; background:var(--white); padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); height:fit-content; }
+    .summary h3{ margin:0 0 12px 0; color:var(--main); }
+    .row{ display:flex; justify-content:space-between; margin-bottom:10px; color:var(--muted); }
+    .total{ display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px dashed #eee; font-size:18px; font-weight:800; }
+    .form-group{ margin-bottom:12px; }
+    label{ display:block; font-size:13px; color:#444; margin-bottom:6px; }
+    input[type=text], input[type=tel]{ width:100%; padding:10px; border-radius:8px; border:1px solid #eee; }
+    .btn-place{ display:block; width:100%; padding:14px 18px; background:var(--main); color:#fff; border-radius:10px; text-align:center; font-weight:800; border:none; cursor:pointer; margin-top:12px; }
+    .note{ font-size:12px; color:#666; margin-top:8px; }
+    @media (max-width:980px){ .wrap{ flex-direction:column; } .order-right{ width:100%; } }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="order-left">
+    <h2>주문서</h2>
+    <p class="note">장바구니에서 선택한 상품들이 자동으로 넘어왔습니다. (체크박스 없음)</p>
+
+    <div id="items"></div>
+  </div>
+
+  <div class="order-right">
+    <div class="summary">
+      <h3>결제 요약</h3>
+      <div class="row"><span>상품 합계</span><span id="sum-product">₩0</span></div>
+      <div class="row"><span>배송비</span><span id="shipping">₩0</span></div>
+      <div class="row"><span>할인</span><span id="discount">₩0</span></div>
+      <div class="total"><span>결제 예정금액</span><strong id="total-pay">₩0</strong></div>
+    </div>
+
+    <form id="order-form" action="#" method="post" onsubmit="return false;">
+      <div class="form-group">
+        <label>수취인 이름</label>
+        <input type="text" name="receiver" id="receiver" required />
+      </div>
+      <div class="form-group">
+        <label>휴대폰</label>
+        <input type="tel" name="phone" id="phone" required />
+      </div>
+      <div class="form-group">
+        <label>배송지 주소</label>
+        <input type="text" name="address" id="address" required />
+      </div>
+
+      <input type="hidden" name="orderData" id="orderData" />
+      <button type="button" class="btn-place" id="placeOrder">결제하기</button>
+      <p class="note">※ 이 페이지는 정적 샘플입니다. 실제 결제 연동은 서버/PG사 연동 필요.</p>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  // 샘플 데이터 (서버 없이 화면에서 테스트 용)
+  var sampleItems = [
+    { productId: 'p-1001', name: '토마토 키링', option: '레드 / 키링', price: 6000, qty: 2, image:'/images/sample1.jpg' },
+    { productId: 'p-1002', name: '솜사탕 파우치', option: '블루핑크', price: 8500, qty: 1, image:'/images/sample2.jpg' }
+  ];
+
+  // 숫자 포맷
+  function numberWithCommas(x){
+    if(x === null || x === undefined) return x;
+    var parts = String(x).split('.');
+    parts[0] = parts[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  }
+  function parsePrice(str){
+    if(!str) return 0;
+    return parseInt(String(str).replace(/[^0-9]/g,''),10) || 0;
+  }
+
+  // 아이템 렌더
+  var $items = document.getElementById('items');
+  function renderItems(items){
+    $items.innerHTML = '';
+    for(var i=0;i<items.length;i++){
+      var it = items[i];
+      var div = document.createElement('div');
+      div.className = 'item';
+      div.setAttribute('data-product-id', it.productId);
+      div.innerHTML =
+        '<img src="'+ (it.image || '') +'" alt="상품이미지" />' +
+        '<div class="meta">' +
+          '<div class="name">'+ escapeHtml(it.name) +'</div>' +
+          '<div class="option">'+ escapeHtml(it.option) +'</div>' +
+          '<div class="qty-control">' +
+            '<button class="qty-decrease">-</button>' +
+            '<input class="qty" value="'+ (it.qty) +'" />' +
+            '<button class="qty-increase">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="price">₩<span class="item-price">'+ numberWithCommas(it.price * it.qty) +'</span></div>';
+      $items.appendChild(div);
+    }
+  }
+
+  // XSS 안전용 간단 이스케이프
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
+  }
+
+  // 재계산
+  function recalcAll(){
+    var nodes = document.querySelectorAll('#items .item');
+    var sum = 0;
+    for(var i=0;i<nodes.length;i++){
+      var node = nodes[i];
+      var qtyInput = node.querySelector('.qty');
+      var qty = parseInt(qtyInput.value,10) || 0;
+      if(qty < 1){ qty = 1; qtyInput.value = 1; }
+      // 원가(단가) 추정: 현재 화면의 item-price는 소계이므로, 단가는 (현재 소계 / 기존 qty) — 하지만 우리는 샘플 데이터의 단가를 모르므로
+      // 구현 편의상: 가격 표시는 단가 * qty. 여기서는 데이터에 단가가 없을 경우, 소계에서 추정하지 않음.
+      var priceText = node.querySelector('.item-price').textContent;
+      var price = parsePrice(priceText);
+      // 만약 price === 0 (초기 렌더 후 계산 위치 문제) -> try to use sampleItems
+      if(price === 0){
+        var pid = node.getAttribute('data-product-id');
+        for(var j=0;j<sampleItems.length;j++){ if(sampleItems[j].productId === pid){ price = sampleItems[j].price * qty; break; } }
+      } else {
+        // 화면에 표시된 소계였을 경우, 단가를 소계/qty. 하지만 여기선 이미 소계로 들어있을 수 있어서 we recalc below
+      }
+      // 안전하게 계산: 만약 we know unit price from sampleItems, prefer that
+      var unit = null;
+      var pid2 = node.getAttribute('data-product-id');
+      for(var k=0;k<sampleItems.length;k++){ if(sampleItems[k].productId === pid2){ unit = sampleItems[k].price; break; } }
+      var subtotal = (unit !== null) ? unit * qty : price;
+      node.querySelector('.item-price').textContent = numberWithCommas(subtotal);
+      sum += subtotal;
+    }
+
+    // 배송비 정책: 50,000원 이상 무료배송, 아니면 3,000원 (예시, 추측입니다)
+    var shipping = (sum === 0 || sum >= 50000) ? 0 : 3000;
+    var discount = 0;
+    var total = sum + shipping - discount;
+
+    document.getElementById('sum-product').textContent = '₩' + numberWithCommas(sum);
+    document.getElementById('shipping').textContent = '₩' + numberWithCommas(shipping);
+    document.getElementById('discount').textContent = '₩' + numberWithCommas(discount);
+    document.getElementById('total-pay').textContent = '₩' + numberWithCommas(total);
+  }
+
+  // 이벤트 위임: 수량 컨트롤
+  document.addEventListener('click', function(ev){
+    var t = ev.target || ev.srcElement;
+    if(t.classList && t.classList.contains('qty-decrease')){
+      var input = t.parentNode.querySelector('.qty');
+      var v = parseInt(input.value,10) || 0;
+      if(v > 1) input.value = v - 1;
+      recalcAll();
+    } else if(t.classList && t.classList.contains('qty-increase')){
+      var input = t.parentNode.querySelector('.qty');
+      var v2 = parseInt(input.value,10) || 0;
+      input.value = v2 + 1;
+      recalcAll();
+    }
+  }, false);
+
+  // 직접 입력 처리
+  document.addEventListener('input', function(ev){
+    var t = ev.target || ev.srcElement;
+    if(t.classList && t.classList.contains('qty')){
+      var v = parseInt(t.value,10);
+      if(isNaN(v) || v < 1) t.value = 1;
+      recalcAll();
+    }
+  }, false);
+
+  // 주문 버튼
+  document.getElementById('placeOrder').addEventListener('click', function(){
+    var receiver = document.getElementById('receiver').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+    var address = document.getElementById('address').value.trim();
+    if(!receiver || !phone || !address){ alert('배송정보를 모두 입력해줘!'); return; }
+
+    // 수집
+    var arr = [];
+    var nodes = document.querySelectorAll('#items .item');
+    for(var i=0;i<nodes.length;i++){
+      var node = nodes[i];
+      var pid = node.getAttribute('data-product-id');
+      var name = node.querySelector('.name').textContent;
+      var opt = node.querySelector('.option').textContent;
+      var qty = parseInt(node.querySelector('.qty').value,10) || 0;
+      var price = parsePrice(node.querySelector('.item-price').textContent);
+      arr.push({ productId: pid, name: name, option: opt, qty: qty, price: price });
+    }
+
+    // 폼 hidden에 넣음 (서버 전송할 때 사용)
+    document.getElementById('orderData').value = JSON.stringify(arr);
+
+    // 실제: form.submit() 또는 fetch POST 등으로 전송
+    // 예시: console.log + alert
+    console.log('주문 데이터:', arr);
+    alert('서버로 주문 데이터 전송 (샘플)\\n' + JSON.stringify(arr, null, 2));
+  }, false);
+
+  // 초기 렌더 + 계산
+  renderItems(sampleItems);
+  recalcAll();
+
+})();
+</script>
+
+</body>
+</html>

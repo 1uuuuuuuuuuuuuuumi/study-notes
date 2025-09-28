@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>장바구니 예제</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .product { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; }
+    .cart { margin-top: 30px; border-top: 2px solid #000; padding-top: 20px; }
+    button { padding: 5px 10px; cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background: #f8f8f8; }
+  </style>
+</head>
+<body>
+
+  <h1>🛒 장바구니 예제</h1>
+
+  <!-- 상품 목록 -->
+  <div class="product">
+    <h3>🍎 사과</h3>
+    <p>가격: 1000원</p>
+    <button onclick="addToCart('사과', 1000)">장바구니 담기</button>
+  </div>
+  <div class="product">
+    <h3>🍌 바나나</h3>
+    <p>가격: 2000원</p>
+    <button onclick="addToCart('바나나', 2000)">장바구니 담기</button>
+  </div>
+  <div class="product">
+    <h3>🍇 포도</h3>
+    <p>가격: 3000원</p>
+    <button onclick="addToCart('포도', 3000)">장바구니 담기</button>
+  </div>
+
+  <!-- 장바구니 -->
+  <div class="cart">
+    <h2>🧺 내 장바구니</h2>
+    <table id="cartTable">
+      <thead>
+        <tr>
+          <th>상품명</th>
+          <th>가격</th>
+          <th>수량</th>
+          <th>합계</th>
+          <th>삭제</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <h3 id="totalPrice">총합계: 0원</h3>
+  </div>
+
+  <script>
+    let cart = [];
+
+    // 장바구니에 추가
+    function addToCart(name, price) {
+      const existingItem = cart.find(item => item.name === name);
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      renderCart();
+    }
+
+    // 장바구니 화면 그리기
+    function renderCart() {
+      const cartTableBody = document.querySelector("#cartTable tbody");
+      cartTableBody.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.price}원</td>
+          <td>
+            <button onclick="changeQuantity(${index}, -1)">-</button>
+            ${item.quantity}
+            <button onclick="changeQuantity(${index}, 1)">+</button>
+          </td>
+          <td>${item.price * item.quantity}원</td>
+          <td><button onclick="removeItem(${index})">삭제</button></td>
+        `;
+        cartTableBody.appendChild(row);
+        total += item.price * item.quantity;
+      });
+
+      document.getElementById("totalPrice").textContent = "총합계: " + total + "원";
+    }
+
+    // 수량 변경
+    function changeQuantity(index, delta) {
+      cart[index].quantity += delta;
+      if (cart[index].quantity <= 0) cart[index].quantity = 1;
+      renderCart();
+    }
+
+    // 아이템 삭제
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+  </script>
+</body>
+</html>

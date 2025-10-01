@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>위시리스트 페이지 — 루미 스타일</title>
+  <style>
+    /* 레드 + 화이트 테마 (사용자 선호) */
+    :root{
+      --red:#DC0630;
+      --white:#ffffff;
+      --muted:#f8f6f6;
+      --card-radius:12px;
+      --gap:12px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+    }
+    body{background:linear-gradient(180deg,var(--white),var(--muted));margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+    .wrap{width:100%;max-width:980px}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    .logo{background:var(--red);color:var(--white);padding:10px 14px;border-radius:10px;font-weight:800;box-shadow:0 6px 18px rgba(220,6,48,0.12)}
+    h1{margin:0;font-size:20px}
+    .sub{color:#4a4a4a;font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+
+    /* 카드 */
+    .card{background:var(--white);padding:16px;border-radius:var(--card-radius);box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+
+    /* 위시리스트 */
+    .wish-list{display:flex;flex-direction:column;gap:10px}
+    .wish-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;border:1px solid #fde0e6}
+    .thumb{width:74px;height:74px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;color:#888}
+    .meta{flex:1}
+    .title{font-weight:700}
+    .price{color:var(--red);font-weight:800}
+    .actions{display:flex;gap:8px}
+    button{cursor:pointer;border:0;padding:8px 10px;border-radius:8px;font-weight:700}
+    .btn-red{background:var(--red);color:var(--white)}
+    .btn-light{background:#fff;border:1px solid #eee}
+
+    /* 사이드 바 */
+    .sidebar h3{margin-top:0}
+    .form-row{display:flex;gap:8px;margin-bottom:8px}
+    input[type=text]{flex:1;padding:10px;border-radius:8px;border:1px solid #eee}
+    .small{font-size:13px;color:#666}
+
+    /* 빈 상태 */
+    .empty{padding:28px;text-align:center;color:#777}
+
+    /* 반응형 */
+    @media (max-width:880px){
+      .grid{grid-template-columns:1fr}
+      .sidebar{order:-1}
+    }
+
+    /* 간단한 애니메이션 */
+    .fade-in{animation:fadeIn .28s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    /* 테이블 느낌의 요약 */
+    .summary{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">WISH 🚀</div>
+      <div>
+        <h1>위시리스트 페이지 — 취향 폭발! 👧🏻✨</h1>
+        <div class="sub">아이템 추가 / 삭제 / 로컬 저장까지 — 가볍게 써봐💕</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="summary" style="margin-bottom:10px">
+          <strong>내 위시리스트</strong>
+          <div class="small">총 <span id="total-count">0</span>개</div>
+        </div>
+
+        <div id="wishList" class="wish-list">
+          <div class="empty" id="emptyMsg">위시리스트가 비어있어요. 오른쪽에서 추가해봐요! 💌</div>
+        </div>
+      </section>
+
+      <aside class="card sidebar">
+        <h3>아이템 추가 ✨</h3>
+        <div class="form-row">
+          <input id="input-title" type="text" placeholder="상품명 입력 (예: 귀여운 키링)" />
+        </div>
+        <div class="form-row">
+          <input id="input-price" type="text" placeholder="가격 입력 (숫자만)" />
+        </div>
+        <div class="form-row">
+          <input id="input-img" type="text" placeholder="이미지 URL (선택)" />
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button id="addBtn" class="btn-red">추가하기 ❤️</button>
+          <button id="clearBtn" class="btn-light">전체 삭제</button>
+        </div>
+
+        <hr />
+        <h3>정렬 & 검색 🔍</h3>
+        <div class="form-row">
+          <select id="sortSelect">
+            <option value="new">최신순</option>
+            <option value="price-asc">가격↑</option>
+            <option value="price-desc">가격↓</option>
+          </select>
+          <input id="searchInput" type="text" placeholder="검색어" />
+        </div>
+
+        <hr />
+        <h3>요약</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="small">총 아이템: <strong id="count">0</strong></div>
+          <div class="small">선택된 합계: <strong id="sum">0</strong>원</div>
+          <div class="small">(모든 데이터는 이 브라우저의 로컬스토리지에 저장됩니다)</div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // 간단한 위시리스트 로직 (localStorage 기반)
+    const LS_KEY = 'lumi_wishlist_v1';
+    const el = {
+      wishList: document.getElementById('wishList'),
+      totalCount: document.getElementById('total-count'),
+      count: document.getElementById('count'),
+      sum: document.getElementById('sum'),
+      emptyMsg: document.getElementById('emptyMsg'),
+      inputTitle: document.getElementById('input-title'),
+      inputPrice: document.getElementById('input-price'),
+      inputImg: document.getElementById('input-img'),
+      addBtn: document.getElementById('addBtn'),
+      clearBtn: document.getElementById('clearBtn'),
+      sortSelect: document.getElementById('sortSelect'),
+      searchInput: document.getElementById('searchInput')
+    };
+
+    let list = load();
+
+    function save(){
+      localStorage.setItem(LS_KEY, JSON.stringify(list));
+    }
+    function load(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return [];
+        return JSON.parse(raw);
+      }catch(e){console.error(e); return []}
+    }
+
+    function uid(){return Date.now().toString(36) + Math.random().toString(36).slice(2,6)}
+
+    function render(){
+      // 정렬, 검색 적용
+      const q = el.searchInput.value.trim().toLowerCase();
+      const sort = el.sortSelect.value;
+      let out = [...list];
+      if(q) out = out.filter(i=>i.title.toLowerCase().includes(q));
+      if(sort==='price-asc') out.sort((a,b)=>a.price-b.price);
+      if(sort==='price-desc') out.sort((a,b)=>b.price-a.price);
+      if(sort==='new') out.sort((a,b)=>b.created - a.created);
+
+      el.wishList.innerHTML='';
+      if(out.length===0){ el.emptyMsg.style.display='block'; } else { el.emptyMsg.style.display='none'; }
+
+      let selectedSum = 0;
+      out.forEach(item=>{
+        const row = document.createElement('div');
+        row.className = 'wish-item fade-in';
+
+        const thumb = document.createElement('div');
+        thumb.className='thumb';
+        if(item.img){ const img = document.createElement('img'); img.src=item.img; img.alt=item.title; img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover'; img.style.borderRadius='6px'; thumb.appendChild(img);} else { thumb.textContent='NO IMG' }
+
+        const meta = document.createElement('div'); meta.className='meta';
+        const t = document.createElement('div'); t.className='title'; t.textContent=item.title;
+        const p = document.createElement('div'); p.className='price'; p.textContent=Number(item.price).toLocaleString() + '원';
+        meta.appendChild(t); meta.appendChild(p);
+
+        const actions = document.createElement('div'); actions.className='actions';
+        const remove = document.createElement('button'); remove.className='btn-light'; remove.textContent='삭제';
+        remove.onclick = ()=>{ if(confirm('삭제할래?')){ list = list.filter(x=>x.id!==item.id); save(); render(); } };
+
+        const toCart = document.createElement('button'); toCart.className='btn-red'; toCart.textContent='장바구니로 →';
+        toCart.onclick = ()=>{ alert('장바구니로 이동하는 시뮬레이션입니다. 실제 결제 기능은 구현되어 있지 않아요.'); };
+
+        actions.appendChild(remove); actions.appendChild(toCart);
+
+        row.appendChild(thumb); row.appendChild(meta); row.appendChild(actions);
+        el.wishList.appendChild(row);
+
+        if(item.selected) selectedSum += Number(item.price)||0;
+      })
+
+      el.totalCount.textContent = out.length;
+      el.count.textContent = out.length;
+      el.sum.textContent = selectedSum.toLocaleString();
+    }
+
+    // 이벤트
+    el.addBtn.addEventListener('click', ()=>{
+      const title = el.inputTitle.value.trim();
+      const price = el.inputPrice.value.trim().replace(/[^0-9]/g,'');
+      const img = el.inputImg.value.trim();
+      if(!title){ alert('상품명을 입력해줘!'); el.inputTitle.focus(); return; }
+      const item = { id: uid(), title, price: price?Number(price):0, img: img||'', created: Date.now() };
+      list.unshift(item);
+      save(); render();
+      el.inputTitle.value=''; el.inputPrice.value=''; el.inputImg.value='';
+    });
+
+    el.clearBtn.addEventListener('click', ()=>{ if(confirm('정말 전체 삭제?')){ list=[]; save(); render(); } });
+    el.sortSelect.addEventListener('change', render);
+    el.searchInput.addEventListener('input', ()=>{ render(); });
+
+    // 데모 아이템 몇 개 (초기 로드시에만 추가)
+    if(list.length===0){
+      list = [
+        {id:uid(), title:'핑크 솜사탕 키링', price:8900, img:'', created:Date.now()-1000*60*60},
+        {id:uid(), title:'레드 하트 스티커팩', price:4500, img:'', created:Date.now()-1000*60*60*24},
+        {id:uid(), title:'빈티지 포스터', price:12000, img:'', created:Date.now()-1000*60*10},
+      ];
+      save();
+    }
+
+    render();
+
+    // 키보드 엔터로 추가
+    [el.inputTitle, el.inputPrice, el.inputImg].forEach(inp=>inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ el.addBtn.click(); } }));
+
+  </script>
+</body>
+</html>

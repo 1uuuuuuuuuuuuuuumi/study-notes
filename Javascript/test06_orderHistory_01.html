@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>마이페이지 — 주문내역</title>
+  <style>
+    /* 레드 + 화이트 쇼핑몰 기본 톤 (사용자 요청 반영) */
+    :root{
+      --brand:#DC0630;
+      --bg:#ffffff;
+      --muted:#666;
+      --card-radius:12px;
+      --gap:14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", "Helvetica Neue", Arial;
+    }
+    body{background:linear-gradient(180deg,#fff 0%, #fffaf9 100%); margin:0; padding:32px; color:#222}
+    .container{max-width:980px; margin:0 auto;}
+
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    .logo{width:56px;height:56px;border-radius:10px;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    h1{font-size:20px;margin:0}
+    p.subtitle{margin:0;color:var(--muted);font-size:13px}
+
+    .card{background:var(--bg);padding:18px;border-radius:var(--card-radius);box-shadow:0 8px 24px rgba(220,6,48,0.06);}
+
+    /* controls */
+    .controls{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .controls .search{flex:1;display:flex;align-items:center}
+    .controls input[type=text]{width:100%;padding:10px 12px;border:1px solid #eee;border-radius:8px}
+    .controls select, .controls button{padding:10px 12px;border-radius:8px;border:1px solid #eee;background:#fff}
+    .controls button.primary{background:var(--brand);color:#fff;border:none}
+
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:12px 10px;text-align:left;border-bottom:1px solid #f3f3f3;font-size:14px}
+    th{color:var(--muted);font-weight:600}
+    td .price{font-weight:700;color:var(--brand)}
+    .status{display:inline-block;padding:6px 8px;border-radius:999px;font-size:12px}
+    .status.pending{background:#fff0f3;color:var(--brand);border:1px solid #ffdede}
+    .status.done{background:#f3fff8;color:#0a8a32;color:#0a8a32;border:1px solid #d6f5df}
+    .btns{display:flex;gap:8px}
+    .btn{padding:8px 10px;border-radius:8px;border:1px solid #eee;background:#fff;cursor:pointer}
+
+    /* 모바일 */
+    @media(max-width:720px){
+      th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4){display:none}
+    }
+
+    /* 간단한 모달 */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35)}
+    .modal .dialog{background:#fff;padding:18px;border-radius:12px;max-width:720px;width:90%}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SHOP</div>
+      <div>
+        <h1>주문내역</h1>
+        <p class="subtitle">최근 주문 1년치까지 보여집니다 • 원하는 주문을 클릭하면 상세보기 가능</p>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="controls">
+        <div class="search">
+          <input id="q" type="text" placeholder="주문번호 / 상품명 / 수령인으로 검색" />
+        </div>
+        <select id="filterStatus">
+          <option value="all">전체 상태</option>
+          <option value="pending">결제대기</option>
+          <option value="paid">결제완료</option>
+          <option value="shipped">배송중</option>
+          <option value="done">배송완료</option>
+          <option value="cancel">취소/환불</option>
+        </select>
+        <button id="exportCsv" class="btn">CSV 내보내기</button>
+        <button id="clearFilters" class="btn">초기화</button>
+      </div>
+
+      <div id="tableWrap">
+        <table id="ordersTable" aria-live="polite">
+          <thead>
+            <tr>
+              <th>주문번호</th>
+              <th>주문일</th>
+              <th>상품/수량</th>
+              <th>금액</th>
+              <th>상태</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+        <small id="summary"></small>
+        <div class="btns">
+          <button id="prev" class="btn">이전</button>
+          <button id="next" class="btn primary">다음</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- modal -->
+  <div id="modal" class="modal" role="dialog" aria-hidden="true">
+    <div class="dialog">
+      <h3 id="modalTitle">주문 상세</h3>
+      <div id="modalBody"></div>
+      <div style="text-align:right;margin-top:12px">
+        <button id="closeModal" class="btn">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 샘플 데이터 (실제 API로 교체 가능) ---
+    const sampleOrders = [];
+    const statuses = ['pending','paid','shipped','done','cancel'];
+    function rand(n){return Math.floor(Math.random()*n)}
+    // 더미 47건 생성
+    for(let i=0;i<47;i++){
+      const id = 'ORD' + (20250000 + i);
+      const qty = rand(3)+1;
+      const s = statuses[rand(statuses.length)];
+      const total = (rand(150)+10) * 1000;
+      sampleOrders.push({
+        id, date: new Date(Date.now() - i*86400000).toISOString().slice(0,10),
+        items: [{name:`귀여운 키링 #${i+1}`,qty}], total, status:s, recipient:`수령인${i+1}`
+      });
+    }
+
+    // 페이지네이션 + 필터링 상태
+    let state = {page:1, perPage:8, q:'', status:'all'};
+
+    const tbody = document.querySelector('#ordersTable tbody');
+    const summary = document.getElementById('summary');
+
+    function formatPrice(n){ return n.toLocaleString() + '원'; }
+
+    function filterAndPaginate(){
+      const q = state.q.trim().toLowerCase();
+      let data = sampleOrders.filter(o => {
+        if(state.status!=='all' && o.status!==state.status) return false;
+        if(!q) return true;
+        return o.id.toLowerCase().includes(q) || o.items.some(it=>it.name.toLowerCase().includes(q)) || o.recipient.toLowerCase().includes(q);
+      });
+      const total = data.length;
+      const pages = Math.max(1, Math.ceil(total/state.perPage));
+      if(state.page>pages) state.page = pages;
+      const start = (state.page-1)*state.perPage;
+      const pageData = data.slice(start, start+state.perPage);
+      return {data:pageData, total, pages};
+    }
+
+    function render(){
+      const res = filterAndPaginate();
+      tbody.innerHTML = '';
+      res.data.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><button class="btn" onclick="openDetail('${o.id}')">${o.id}</button></td>
+          <td>${o.date}</td>
+          <td>${o.items.map(it=>`${it.name} x${it.qty}`).join('<br>')}</td>
+          <td class="price">${formatPrice(o.total)}</td>
+          <td>${renderStatus(o.status)}</td>
+          <td><button class="btn" onclick="reorder('${o.id}')">재주문</button> <button class="btn" onclick="downloadInvoice('${o.id}')">영수증</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      summary.textContent = `전체 ${res.total}건 · ${state.page}/${res.pages} 페이지`;
+    }
+
+    function renderStatus(s){
+      if(s==='pending') return `<span class="status pending">결제대기</span>`;
+      if(s==='paid') return `<span class="status">결제완료</span>`;
+      if(s==='shipped') return `<span class="status">배송중</span>`;
+      if(s==='done') return `<span class="status done">배송완료</span>`;
+      if(s==='cancel') return `<span class="status">취소/환불</span>`;
+      return `<span class="status">알수없음</span>`;
+    }
+
+    // 컨트롤 이벤트
+    document.getElementById('q').addEventListener('input', e => { state.q = e.target.value; state.page=1; render(); });
+    document.getElementById('filterStatus').addEventListener('change', e => { state.status = e.target.value; state.page=1; render(); });
+    document.getElementById('prev').addEventListener('click', ()=>{ if(state.page>1){state.page--; render();}});
+    document.getElementById('next').addEventListener('click', ()=>{ state.page++; render(); });
+    document.getElementById('clearFilters').addEventListener('click', ()=>{ state={page:1,perPage:8,q:'',status:'all'}; document.getElementById('q').value=''; document.getElementById('filterStatus').value='all'; render();});
+
+    // CSV 내보내기
+    document.getElementById('exportCsv').addEventListener('click', ()=>{
+      const rows = [['주문번호','주문일','상품','금액','상태','수령인']];
+      const all = sampleOrders.filter(o => state.status==='all' ? true : o.status===state.status ).map(o=>[
+        o.id, o.date, o.items.map(it=>`${it.name} x${it.qty}`).join('|'), o.total, o.status, o.recipient
+      ]);
+      rows.push(...all);
+      const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download = 'orders.csv'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // 상세보기 Modal
+    window.openDetail = function(id){
+      const ord = sampleOrders.find(o=>o.id===id);
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `<p><strong>주문번호:</strong> ${ord.id}</p>
+        <p><strong>주문일:</strong> ${ord.date}</p>
+        <p><strong>수령인:</strong> ${ord.recipient}</p>
+        <p><strong>상품:</strong></p>
+        <ul>${ord.items.map(it=>`<li>${it.name} — 수량 ${it.qty}</li>`).join('')}</ul>
+        <p><strong>총액:</strong> ${formatPrice(ord.total)}</p>
+        <p><strong>상태:</strong> ${renderStatus(ord.status)}</p>`;
+      const modal = document.getElementById('modal'); modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+    }
+    document.getElementById('closeModal').addEventListener('click', ()=>{document.getElementById('modal').style.display='none';document.getElementById('modal').setAttribute('aria-hidden','true');});
+
+    window.reorder = function(id){ alert(id + ' 재주문 로직을 여기에 연결하세요.'); }
+    window.downloadInvoice = function(id){ alert(id + ' 영수증 다운로드(플레이스홀더)'); }
+
+    // 초기 렌더
+    render();
+  </script>
+</body>
+</html>

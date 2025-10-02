@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>회원 주문내역 (JS 버전) — 미리보기</title>
+  <style>
+    :root{--brand:#DC0630;--bg:#fff;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Inter, Noto Sans KR, Arial, sans-serif;background:linear-gradient(180deg,#fff 0%, #fff8f8 100%);padding:28px;color:#222}
+    .wrap{max-width:980px;margin:0 auto}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .logo{width:60px;height:60px;border-radius:12px;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(220,6,48,0.06)}
+
+    .controls{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .controls input{flex:1;padding:10px 12px;border:1px solid #eee;border-radius:10px}
+    .controls select,.controls button{padding:10px 12px;border-radius:10px;border:1px solid #eee;background:#fff}
+    .controls button.primary{background:var(--brand);color:#fff;border:none}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 8px;text-align:left;border-bottom:1px solid #faf0f0;font-size:14px}
+    th{color:var(--muted);font-weight:600}
+    .price{font-weight:700;color:var(--brand)}
+    .status{display:inline-block;padding:6px 10px;border-radius:999px;font-size:13px}
+    .status.pending{background:#fff0f3;color:var(--brand);border:1px solid #ffdede}
+    .status.done{background:#f3fff8;color:#0a8a32;border:1px solid #d6f5df}
+
+    .btn{padding:8px 10px;border-radius:8px;border:1px solid #eee;background:#fff;cursor:pointer}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:60}
+    .modal .dialog{background:#fff;padding:18px;border-radius:12px;max-width:720px;width:94%}
+
+    @media(max-width:720px){
+      th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4){display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">SHOP</div>
+      <div>
+        <h1 style="margin:0;font-size:20px">회원 주문내역 미리보기 👧🏻</h1>
+        <div style="color:#777;font-size:13px">실제 회원 페이지처럼 보이도록 만든 더미 데모 (JS)</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="controls">
+        <input id="q" placeholder="주문번호 / 상품명 / 수령인 검색" />
+        <select id="status">
+          <option value="all">전체 상태</option>
+          <option value="pending">결제대기</option>
+          <option value="paid">결제완료</option>
+          <option value="shipped">배송중</option>
+          <option value="done">배송완료</option>
+          <option value="cancel">취소/환불</option>
+        </select>
+        <button id="csv" class="btn">CSV</button>
+        <button id="reset" class="btn">초기화</button>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table id="ordersTable">
+          <thead>
+            <tr>
+              <th>주문번호</th>
+              <th>주문일</th>
+              <th>상품/수량</th>
+              <th>금액</th>
+              <th>상태</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div id="summary">전체 0건</div>
+        <div style="display:flex;gap:8px">
+          <button id="prev" class="btn">이전</button>
+          <button id="next" class="btn primary">다음</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="dialog">
+      <h3 id="mTitle">주문 상세</h3>
+      <div id="mBody"></div>
+      <div style="text-align:right;margin-top:12px"><button id="closeModal" class="btn">닫기</button></div>
+    </div>
+  </div>
+
+  <script>
+    // 더미 회원 주문 데이터 (간단한 샘플)
+    const orders = [];
+    const sts = ['pending','paid','shipped','done','cancel'];
+    for(let i=0;i<34;i++){
+      orders.push({
+        id: 'M' + (20254000 + i),
+        date: new Date(Date.now() - i*86400000).toISOString().slice(0,10),
+        items: [{name:`귀여운 키링 #${i+1}`, qty: Math.floor(Math.random()*3)+1}],
+        total: (Math.floor(Math.random()*120)+15) * 1000,
+        status: sts[i % sts.length],
+        recipient: `김수령${i+1}`
+      });
+    }
+
+    let state = {page:1, perPage:7, q:'', status:'all'};
+    const tbody = document.querySelector('#ordersTable tbody');
+    const summary = document.getElementById('summary');
+
+    function formatPrice(n){ return n.toLocaleString() + '원'; }
+
+    function renderStatus(s){
+      if(s==='pending') return `<span class="status pending">결제대기</span>`;
+      if(s==='paid') return `<span class="status">결제완료</span>`;
+      if(s==='shipped') return `<span class="status">배송중</span>`;
+      if(s==='done') return `<span class="status done">배송완료</span>`;
+      if(s==='cancel') return `<span class="status">취소/환불</span>`;
+      return `<span class="status">알수없음</span>`;
+    }
+
+    function filterAndPage(){
+      const q = state.q.trim().toLowerCase();
+      let data = orders.filter(o => {
+        if(state.status !== 'all' && o.status !== state.status) return false;
+        if(!q) return true;
+        return o.id.toLowerCase().includes(q) || o.items.some(it=>it.name.toLowerCase().includes(q)) || o.recipient.toLowerCase().includes(q);
+      });
+      const total = data.length;
+      const pages = Math.max(1, Math.ceil(total/state.perPage));
+      if(state.page > pages) state.page = pages;
+      const start = (state.page-1)*state.perPage;
+      const pageData = data.slice(start, start+state.perPage);
+      return {data:pageData, total, pages};
+    }
+
+    function render(){
+      const res = filterAndPage();
+      tbody.innerHTML = '';
+      res.data.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><button class="btn" onclick="openDetail('${o.id}')">${o.id}</button></td>
+          <td>${o.date}</td>
+          <td>${o.items.map(it=>`${it.name} x${it.qty}`).join('<br>')}</td>
+          <td class="price">${formatPrice(o.total)}</td>
+          <td>${renderStatus(o.status)}</td>
+          <td><button class="btn" onclick="reorder('${o.id}')">재주문</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      summary.textContent = `전체 ${res.total}건 · ${state.page}/${res.pages} 페이지`;
+    }
+
+    // controls
+    document.getElementById('q').addEventListener('input', e=>{ state.q = e.target.value; state.page=1; render(); });
+    document.getElementById('status').addEventListener('change', e=>{ state.status = e.target.value; state.page=1; render(); });
+    document.getElementById('prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; render(); }});
+    document.getElementById('next').addEventListener('click', ()=>{ state.page++; render(); });
+    document.getElementById('reset').addEventListener('click', ()=>{ state={page:1,perPage:7,q:'',status:'all'}; document.getElementById('q').value=''; document.getElementById('status').value='all'; render(); });
+
+    document.getElementById('csv').addEventListener('click', ()=>{
+      const rows = [['주문번호','주문일','상품','금액','상태','수령인']];
+      orders.forEach(o=> rows.push([o.id,o.date,o.items.map(it=>`${it.name} x${it.qty}`).join('|'),o.total,o.status,o.recipient]));
+      const csv = rows.map(r => r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'});
+      const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='member-orders.csv'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // modal/detail
+    window.openDetail = function(id){
+      const o = orders.find(x=>x.id===id);
+      const b = document.getElementById('mBody');
+      b.innerHTML = `\n        <p><strong>주문번호:</strong> ${o.id}</p>\n        <p><strong>주문일:</strong> ${o.date}</p>\n        <p><strong>수령인:</strong> ${o.recipient}</p>\n        <p><strong>상품:</strong></p>\n        <ul>${o.items.map(it=>`<li>${it.name} — 수량 ${it.qty}</li>`).join('')}</ul>\n        <p><strong>총액:</strong> ${formatPrice(o.total)}</p>\n        <p><strong>상태:</strong> ${renderStatus(o.status)}</p>`;
+      const m = document.getElementById('modal'); m.style.display='flex'; m.setAttribute('aria-hidden','false');
+    }
+    document.getElementById('closeModal').addEventListener('click', ()=>{ const m = document.getElementById('modal'); m.style.display='none'; m.setAttribute('aria-hidden','true'); });
+
+    window.reorder = function(id){ alert(id + ' 재주문(데모)'); }
+
+    render();
+  </script>
+</body>
+</html>

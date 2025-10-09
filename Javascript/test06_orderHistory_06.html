@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopHub - 주문내역</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        .nav {
+            display: flex;
+            gap: 35px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav a:hover {
+            color: #4CAF50;
+        }
+
+        .nav a.active {
+            color: #4CAF50;
+            font-weight: 700;
+        }
+
+        .user-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        .icon-btn:hover {
+            color: #4CAF50;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* 메인 컨텐츠 */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            gap: 30px;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 240px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar-menu a {
+            text-decoration: none;
+            color: #666;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .sidebar-menu a.active {
+            background: #e8f5e9;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        /* 메인 컨텐츠 영역 */
+        .content {
+            flex: 1;
+        }
+
+        .page-header {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 15px;
+        }
+
+        /* 필터 탭 */
+        .filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 12px 24px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .filter-tab:hover {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .filter-tab.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        /* 주문 카드 */
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f5f5f5;
+            margin-bottom: 20px;
+        }
+
+        .order-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .order-date {
+            font-size: 15px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .order-number {
+            font-size: 13px;
+            color: #999;
+            background: #f5f5f5;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .order-body {
+            display: flex;
+            gap: 25px;
+        }
+
+        .product-image {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+            flex-shrink: 0;
+            border: 1px solid #f0f0f0;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .product-options {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .product-quantity {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .order-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+            min-width: 180px;
+        }
+
+        .status-badge {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-delivered {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-shipping {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-preparing {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-cancelled {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #f5f5f5;
+            border-color: #d0d0d0;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            border-color: #45a049;
+        }
+
+        .btn-outline {
+            color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .btn-outline:hover {
+            background: #e8f5e9;
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-text {
+            color: #999;
+            font-size: 15px;
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #333;
+        }
+
+        .close-btn {
+            background: #f5f5f5;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            color: #e65100;
+            border-color: #ff9800;
+        }
+
+        .refund-product {
+            display: flex;
+            gap: 18px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .refund-product img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .refund-product-info {
+            flex: 1;
+        }
+
+        .refund-product-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .refund-product-price {
+            color: #4CAF50;
+            font-weight: 800;
+            font-size: 18px;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .refund-info {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .refund-info-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2e7d32;
+            font-size: 16px;
+        }
+
+        .refund-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .refund-info-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #2e7d32;
+            font-weight: 800;
+            font-size: 18px;
+            color: #2e7d32;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-btn-submit {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .modal-btn-submit:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        /* 푸터 */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 50px 20px 30px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #bdc3c7;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .footer-section a:hover {
+            color: #4CAF50;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #34495e;
+            color: #95a5a6;
+            font-size: 13px;
+        }
+
+        @media (max-width: 968px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .order-body {
+                flex-direction: column;
+            }
+
+            .order-actions {
+                flex-direction: row;
+                justify-content: flex-start;
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">ShopHub</a>
+            <nav class="nav">
+                <a href="#">홈</a>
+                <a href="#">카테고리</a>
+                <a href="#">베스트</a>
+                <a href="#">특가</a>
+            </nav>
+            <div class="user-menu">
+                <button class="icon-btn">🔍</button>
+                <button class="icon-btn">🛒</button>
+                <span class="user-name">홍길동님</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-container">
+        <!-- 사이드바 -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">마이페이지</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active">주문내역</a></li>
+                    <li><a href="#">취소/반품</a></li>
+                    <li><a href="#">리뷰관리</a></li>
+                    <li><a href="#">찜한상품</a></li>
+                    <li><a href="#">쿠폰</a></li>
+                    <li><a href="#">포인트</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">회원정보</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#">개인정보 수정</a></li>
+                    <li><a href="#">배송지 관리</a></li>
+                    <li><a href="#">알림설정</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- 컨텐츠 영역 -->
+        <main class="content">
+            <div class="page-header">
+                <h1 class="page-title">주문내역</h1>
+                <p class="page-subtitle">고객님의 주문 내역을 확인하실 수 있습니다</p>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">전체</button>
+                    <button class="filter-tab" data-filter="preparing">상품준비중</button>
+                    <button class="filter-tab" data-filter="shipping">배송중</button>
+                    <button class="filter-tab" data-filter="delivered">배송완료</button>
+                    <button class="filter-tab" data-filter="cancelled">취소/반품</button>
+                </div>
+            </div>
+
+            <div id="orderList"></div>
+        </main>
+    </div>
+
+    <!-- 환불 모달 -->
+    <div class="modal" id="refundModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">환불 신청</h2>
+                <button class="close-btn" onclick="closeRefundModal()">&times;</button>
+            </div>
+
+            <div class="alert alert-warning">
+                ⚠️ 환불 신청 후에는 취소가 불가능합니다. 신중하게 작성해주세요.
+            </div>
+
+            <div class="refund-product" id="refundProductInfo"></div>
+
+            <form id="refundForm">
+                <div class="form-group">
+                    <label class="form-label">환불 사유</label>
+                    <select class="form-select" id="refundReason" required>
+                        <option value="">선택해주세요</option>
+                        <option value="단순변심">단순 변심</option>
+                        <option value="상품불량">상품 불량/파손</option>
+                        <option value="오배송">오배송</option>
+                        <option value="상품정보상이">상품 정보 상이</option>
+                        <option value="배송지연">배송 지연</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">상세 사유</label>
+                    <textarea class="form-textarea" id="refundDetail" placeholder="환불 사유를 자세히 작성해주세요" required></textarea>
+                </div>
+
+                <div class="refund-info">
+                    <div class="refund-info-title">환불 예상 금액</div>
+                    <div class="refund-info-item">
+                        <span>주문 금액</span>
+                        <span id="refundOriginalPrice">0원</span>
+                    </div>
+                    <div class="refund-info-item">
+                        <span>배송비 환불</span>
+                        <span id="refundShippingFee">0원</span>
+                    </div>
+                    <div class="refund-info-total">
+                        <span>총 환불 금액</span>
+                        <span id="refundTotalAmount">0원</span>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeRefundModal()">취소</button>
+                    <button type="submit" class="modal-btn modal-btn-submit">환불 신청하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>ShopHub</h3>
+                <p>최고의 쇼핑 경험을 제공합니다</p>
+                <p>고객센터: 1588-0000</p>
+                <p>평일 09:00 - 18:00</p>
+            </div>
+            <div class="footer-section">
+                <h3>고객지원</h3>
+                <a href="#">공지사항</a>
+                <a href="#">자주 묻는 질문</a>
+                <a href="#">1:1 문의</a>
+                <a href="#">배송조회</a>
+            </div>
+            <div class="footer-section">
+                <h3>정책</h3>
+                <a href="#">이용약관</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">환불정책</a>
+            </div>
+            <div class="footer-section">
+                <h3>회사소개</h3>
+                <a href="#">회사소개</a>
+                <a href="#">채용정보</a>
+                <a href="#">제휴문의</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const orders = [
+            {
+                id: '20251008001',
+                date: '2025.10.08',
+                productName: '무선 블루투스 이어폰 프리미엄',
+                options: '색상: 화이트 / 케이스 포함',
+                quantity: 1,
+                price: 89000,
+                image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop',
+                status: 'shipping',
+                statusText: '배송중',
+                shippingFee: 3000
+            },
+            {
+                id: '20251005002',
+                date: '2025.10.05',
+                productName: '스마트워치 프로 5세대',
+                options: '색상: 미드나이트 블랙 / 사이즈: 44mm',
+                quantity: 1,
+                price: 459000,
+                image: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=300&h=300&fit=crop',
+                status: 'delivered',
+                statusText: '배송완료',
+                shippingFee: 0
+            },
+            {
+                id: '20251003003',
+                date: '2025.10.03',
+                productName: '프리미엄 노트북 파우치',
+                options: '색상: 스페이스 그레이 / 사이즈: 13인치',
+                quantity: 2,
+                price: 35000,
+                image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=300&h=300&fit=crop',
+                status: 'delivered',
+                statusText: '배송완료',
+                shippingFee: 3000
+            },
+            {
+                id: '20250928004',
+                date: '2025.09.28',
+                productName: '기계식 키보드 RGB 백라이트',
+                options: '스위치: 청축 / 색상: 화이트 / 한영자판',
+                quantity: 1,
+                price: 159000,
+                image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=300&h=300&fit=crop',
+                status: 'preparing',
+                statusText: '상품준비중',
+                shippingFee: 0
+            }
+        ];
+
+        let currentRefundOrder = null;
+
+        function formatPrice(price) {
+            return price.toLocaleString('ko-KR') + '원';
+        }
+
+        function renderOrders(filterStatus = 'all') {
+            const orderList = document.getElementById('orderList');
+            const filteredOrders = filterStatus === 'all' 
+                ? orders 
+                : orders.filter(order => order.status === filterStatus);
+
+            if (filteredOrders.length === 0) {
+                orderList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <h3 class="empty-title">주문내역이 없습니다</h3>
+                        <p class="empty-text">쇼핑을 시작해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            orderList.innerHTML = filteredOrders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <span class="order-date">📅 ${order.date}</span>
+                            <span class="order-number">주문번호: ${order.id}</span>
+                        </div>
+                    </div>
+                    <div class="order-body">
+                        <img src="${order.image}" alt="${order.productName}" class="product-image">
+                        <div class="product-details">
+                            <h3 class="product-name">${order.productName}</h3>
+                            <p class="product-options">${order.options}</p>
+                            <p class="product-quantity">수량: ${order.quantity}개</p>
+                            <div class="product-price">${formatPrice(order.price)}</div>
+                        </div>
+                        <div class="order-actions">
+                            <span class="status-badge status-${order.status}">${order.statusText}</span>
+                            <div class="action-buttons">
+                                ${order.status === 'delivered' ? 
+                                    '<button class="btn btn-outline">⭐ 리뷰 작성</button>' : ''}
+                                ${order.status === 'delivered' ? 
+                                    '<button class="btn" onclick="openRefundModal(\'' + order.id + '\')">💳 환불신청</button>' : ''}
+                                ${order.status === 'shipping' ? 
+                                    '<button class="btn btn-primary">🚚 배송조회</button>' : ''}
+                                ${order.status === 'preparing' ? 
+                                    '<button class="btn">❌ 주문취소</button>' : ''}
+                                <button class="btn">📋 주문상세</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 필터 탭 이벤트
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                renderOrders(this.dataset.filter);
+            });
+        });
+
+        // 환불 모달 열기
+        function openRefundModal(orderId) {
+            currentRefundOrder = orders.find(order => order.id === orderId);
+            if (!currentRefundOrder) return;
+
+            document.getElementById('refundProductInfo').innerHTML = `
+                <img src="${currentRefundOrder.image}" alt="${currentRefundOrder.productName}">
+                <div class="refund-product-info">
+                    <div class="refund-product-name">${currentRefundOrder.productName}</div>
+                    <div class="product-options">${currentRefundOrder.options}</div>
+                    <div class="product-quantity">수량: ${currentRefundOrder.quantity}개</div>
+                    <div class="refund-product-price">${formatPrice(currentRefundOrder.price)}</div>
+                </div>
+            `;
+
+            const shippingFeeRefund = currentRefundOrder.shippingFee;
+            const totalRefund = currentRefundOrder.price + shippingFeeRefund;
+
+            document.getElementById('refundOriginalPrice').textContent = formatPrice(currentRefundOrder.price);
+            document.getElementById('refundShippingFee').textContent = formatPrice(shippingFeeRefund);
+            document.getElementById('refundTotalAmount').textContent = formatPrice(totalRefund);
+
+            document.getElementById('refundModal').classList.add('active');
+        }
+
+        // 환불 모달 닫기
+        function closeRefundModal() {
+            document.getElementById('refundModal').classList.remove('active');
+            document.getElementById('refundForm').reset();
+            currentRefundOrder = null;
+        }
+
+        // 환불 신청 처리
+        document.getElementById('refundForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const reason = document.getElementById('refundReason').value;
+            const detail = document.getElementById('refundDetail').value;
+
+            if (!reason || !detail) {
+                alert('모든 항목을 입력해주세요.');
+                return;
+            }
+
+            const refundData = {
+                orderId: currentRefundOrder.id,
+                productName: currentRefundOrder.productName,
+                reason: reason,
+                detail: detail,
+                refundAmount: currentRefundOrder.price + currentRefundOrder.shippingFee,
+                requestDate: new Date().toISOString()
+            };
+
+            console.log('환불 신청 데이터:', refundData);
+
+            const orderIndex = orders.findIndex(o => o.id === currentRefundOrder.id);
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = 'cancelled';
+                orders[orderIndex].statusText = '환불처리중';
+            }
+
+            alert('✅ 환불 신청이 완료되었습니다.\n처리 완료까지 3-5일 정도 소요됩니다.');
+            closeRefundModal();
+            renderOrders();
+        });
+
+        // 모달 외부 클릭시 닫기
+        document.getElementById('refundModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRefundModal();
+            }
+        });
+
+        // 초기 렌더링
+        renderOrders();
+    </script>
+</body>
+</html>

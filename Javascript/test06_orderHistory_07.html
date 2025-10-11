@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주문 내역</title>
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background: linear-gradient(135deg, #fff, #ffe5e5);
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      width: 80%;
+      max-width: 900px;
+      margin: auto;
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      color: #DC0630;
+      margin-bottom: 25px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+    }
+    th, td {
+      border-bottom: 1px solid #f2f2f2;
+      padding: 12px;
+    }
+    th {
+      background: #DC0630;
+      color: white;
+      border-radius: 6px;
+    }
+    tr:hover {
+      background-color: #fff5f5;
+    }
+    .status {
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+    .배송중 { background-color: #ffb300; color: white; }
+    .배송완료 { background-color: #4caf50; color: white; }
+    .환불요청 { background-color: #e53935; color: white; }
+    .btns {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    button {
+      background: #DC0630;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #b20526;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🛍 주문 내역 👧🏻</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>주문번호</th>
+          <th>주문일</th>
+          <th>상품명</th>
+          <th>금액</th>
+          <th>상태</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody id="orderTable"></tbody>
+    </table>
+    <div class="btns">
+      <button id="csv">📦 CSV로 내보내기</button>
+    </div>
+  </div>
+
+  <script>
+    // 💫 샘플 데이터 (실제로는 서버에서 받아옴!)
+    const orders = [
+      { id: "ORD-1001", date: "2025-10-01", product: "핑크 키링", amount: 9800, status: "배송중" },
+      { id: "ORD-1002", date: "2025-09-28", product: "하트 파우치", amount: 15800, status: "배송완료" },
+      { id: "ORD-1003", date: "2025-09-25", product: "별빛 브로치", amount: 12000, status: "환불요청" }
+    ];
+
+    const table = document.getElementById("orderTable");
+
+    // 🌸 주문 목록 출력
+    orders.forEach(order => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${order.id}</td>
+        <td>${order.date}</td>
+        <td>${order.product}</td>
+        <td>${order.amount.toLocaleString()}원</td>
+        <td><span class="status ${order.status}">${order.status}</span></td>
+        <td>
+          ${order.status === "배송완료" ? `<button onclick="refund('${order.id}')">환불요청</button>` 
+          : order.status === "배송중" ? `<button onclick="cancel('${order.id}')">주문취소</button>` 
+          : "—"}
+        </td>
+      `;
+      table.appendChild(row);
+    });
+
+    // 💸 환불 요청 함수
+    function refund(id) {
+      alert(`환불요청 완료! (${id})`);
+    }
+
+    // ❌ 주문 취소 함수
+    function cancel(id) {
+      alert(`주문취소 완료! (${id})`);
+    }
+
+    // 📁 CSV 내보내기
+    document.getElementById('csv').addEventListener('click', () => {
+      const rows = [['주문번호','주문일','상품','금액','상태']];
+      orders.forEach(o => rows.push([o.id, o.date, o.product, o.amount, o.status]));
+
+      let csvContent = rows.map(e => e.join(',')).join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'order_history.csv';
+      link.click();
+    });
+  </script>
+</body>
+</html>

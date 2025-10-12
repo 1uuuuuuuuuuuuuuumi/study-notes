@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>주문내역 페이지 🌟</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(120deg, #ffe6e6, #fff0f5);
+    padding: 20px;
+  }
+  .container {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  h1 {
+    text-align: center;
+    color: #DC0630;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    background-color: #fce4ec;
+    color: #DC0630;
+  }
+  tr:hover {
+    background-color: #ffe6f0;
+  }
+  button {
+    background-color: #DC0630;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover {
+    background-color: #ff3366;
+  }
+  .btns {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📦 내 주문내역</h1>
+  <table id="orderTable">
+    <thead>
+      <tr>
+        <th>주문번호</th>
+        <th>주문일</th>
+        <th>상품</th>
+        <th>금액</th>
+        <th>상태</th>
+        <th>수령인</th>
+        <th>액션</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 주문내역이 JS로 들어감 -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+const orders = [
+  {id: '20251012-001', date: '2025-10-12', product: '키링💖', price: '15,000원', status: '배송중', recipient: '카레빵맨👧🏻'},
+  {id: '20251011-002', date: '2025-10-11', product: '노트📔', price: '8,000원', status: '배송완료', recipient: '호빵맨👧🏻'},
+  {id: '20251010-003', date: '2025-10-10', product: '스티커세트✨', price: '5,000원', status: '주문취소', recipient: '카레빵맨👧🏻'},
+];
+
+function renderOrders() {
+  const tbody = document.querySelector('#orderTable tbody');
+  tbody.innerHTML = '';
+  orders.forEach(order => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${order.id}</td>
+      <td>${order.date}</td>
+      <td>${order.product}</td>
+      <td>${order.price}</td>
+      <td>${order.status}</td>
+      <td>${order.recipient}</td>
+      <td class="btns">
+        ${order.status !== '주문취소' ? `<button onclick="cancelOrder('${order.id}')">주문취소</button>` : ''}
+        ${order.status === '배송완료' ? `<button onclick="requestRefund('${order.id}')">환불신청</button>` : ''}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function cancelOrder(id) {
+  alert(id + ' 주문을 취소했어요 ❌');
+  const order = orders.find(o => o.id === id);
+  if(order) order.status = '주문취소';
+  renderOrders();
+}
+
+function requestRefund(id) {
+  alert(id + ' 환불 요청 완료 💸');
+}
+
+renderOrders();
+</script>
+
+</body>
+</html>

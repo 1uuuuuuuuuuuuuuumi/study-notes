@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>주문내역 💖</title>
+<style>
+  body {
+    font-family: "Pretendard", sans-serif;
+    background: linear-gradient(135deg, #fff0f5, #ffe4e1);
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #dc0630;
+    font-size: 28px;
+    margin-bottom: 30px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    background-color: #ffe6ea;
+    color: #333;
+    padding: 12px;
+    text-align: center;
+    border-bottom: 2px solid #dc0630;
+  }
+
+  td {
+    padding: 14px;
+    text-align: center;
+    border-bottom: 1px solid #f5c2c7;
+  }
+
+  tr:hover {
+    background-color: #fff7f8;
+  }
+
+  .status {
+    font-weight: bold;
+    color: #dc0630;
+  }
+
+  .btns {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+    gap: 12px;
+  }
+
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .btn-cancel {
+    background-color: #ffb6c1;
+  }
+  .btn-cancel:hover {
+    background-color: #ff8fa3;
+  }
+
+  .btn-refund {
+    background-color: #ffd700;
+  }
+  .btn-refund:hover {
+    background-color: #fbc02d;
+  }
+
+  .btn-download {
+    background-color: #dc0630;
+    color: white;
+  }
+  .btn-download:hover {
+    background-color: #b40024;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛍️ 주문내역</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>주문번호</th>
+          <th>주문일</th>
+          <th>상품명</th>
+          <th>금액</th>
+          <th>상태</th>
+          <th>수령인</th>
+        </tr>
+      </thead>
+      <tbody id="orderList">
+        <!-- 주문 데이터가 들어갈 부분 -->
+      </tbody>
+    </table>
+
+    <div class="btns">
+      <button class="btn-cancel">주문취소</button>
+      <button class="btn-refund">환불요청</button>
+      <button class="btn-download" id="csv">CSV로 저장</button>
+    </div>
+  </div>
+
+  <script>
+    const orders = [
+      { id: 'A1023', date: '2025-10-13', product: '러블리 곰돌이 키링 🧸', price: '12,000원', status: '배송완료', receiver: '루미' },
+      { id: 'A1024', date: '2025-10-10', product: '하트 머그컵 💖', price: '15,500원', status: '배송중', receiver: '혜원' },
+      { id: 'A1025', date: '2025-10-08', product: '핑크 에코백 🌸', price: '22,000원', status: '결제완료', receiver: '루미' },
+    ];
+
+    const tbody = document.getElementById('orderList');
+
+    orders.forEach(order => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${order.id}</td>
+        <td>${order.date}</td>
+        <td>${order.product}</td>
+        <td>${order.price}</td>
+        <td class="status">${order.status}</td>
+        <td>${order.receiver}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // CSV 다운로드 기능
+    document.getElementById('csv').addEventListener('click', () => {
+      const rows = [['주문번호','주문일','상품','금액','상태','수령인']];
+      orders.forEach(o => rows.push([o.id, o.date, o.product, o.price, o.status, o.receiver]));
+      let csvContent = rows.map(e => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "order-history.csv";
+      link.click();
+    });
+  </script>
+</body>
+</html>

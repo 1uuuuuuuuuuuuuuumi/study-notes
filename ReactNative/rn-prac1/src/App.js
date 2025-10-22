@@ -16,6 +16,14 @@ export const COLORS = {
   lightGray: "#E5E5EA",    // 연한 회색
 };
 
+// 텍스트 크기 정의
+export const SIZES = {
+  small: 12,    // 작은 텍스트
+  medium: 16,   // 중간 텍스트
+  large: 20,    // 큰 텍스트
+  xlarge: 24,   // 매우 큰 텍스트
+}
+
 // 여백(간격) 정의
 export const SPACING = {
   xs: 4,    // 매우 작은 여백

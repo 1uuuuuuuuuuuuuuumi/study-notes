@@ -1,8 +1,7 @@
-import { registerRootComponent } from 'expo';
+import { AppRegistry } from "react-native";
+import App from './src/App'; // src 폴더의 App.js를 가져옴
+import { name as appName } from './app.json';
 
-import App from './App';
-
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
-registerRootComponent(App);
+// 앱을 등록한다.
+// React Native가 이 부분을 보고 앱을 실행한다.
+AppRegistry.registerComponent(appName, () => App);

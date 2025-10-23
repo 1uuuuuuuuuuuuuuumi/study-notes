@@ -1,5 +1,8 @@
+// 앱 진입점
+
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import QuizCard from "./src/components/QuizCard";
 
 export default function App() {
   const [message, setMessage] = useState("");
@@ -19,8 +22,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>React Native ↔ Django 연결 테스트</Text>
-      <Text style={styles.text}>{message}</Text>
+      
     </View>
   );
 }

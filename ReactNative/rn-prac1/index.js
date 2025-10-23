@@ -1,7 +1,7 @@
-import { AppRegistry } from "react-native";
-import App from './src/App'; // src 폴더의 App.js를 가져옴
-import { name as appName } from './app.json';
+import { registerRootComponent } from "expo";
 
-// 앱을 등록한다.
-// React Native가 이 부분을 보고 앱을 실행한다.
-AppRegistry.registerComponent(appName, () => App);
+import App from "./App";
+
+// registerRootComponent 호출은
+// Expo와 React Native CLI 환경 모두에서 앱의 진입점을 설정하는 역할을 한다.
+registerRootComponent(App);

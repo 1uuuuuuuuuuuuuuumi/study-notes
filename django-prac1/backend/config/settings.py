@@ -54,7 +54,7 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True # 개발용 전체 허용 / 네트워크 접근 권한
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database

@@ -12,3 +12,12 @@ while True: # True니까 무한반복!
     print("멈춰!!")
     break
   i += 1
+
+# continue : "이번 차례만 스킵하고 다음으로 넘어가!" 하는 명령어
+i = 0
+while i < 5:
+  i += 1
+  if i == 3:
+    print("3은 건너뛸게여~")
+    continue
+  print("숫자 : ", i)

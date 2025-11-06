@@ -10,3 +10,12 @@ fruits = ["사과", "바나나", "딸기"]
 
 for i in range(len(fruits)):
   print(i + 1, "번째 과일은", fruits[i], "야!")
+
+# 리스트에 새 값 넣기 (append)
+cart = []
+
+for i in range(3):
+  item = input("장바구니에 넣을 과일을 적어! : ")
+  cart.append(item)
+
+print("키미노 장바구니와 : ", cart)

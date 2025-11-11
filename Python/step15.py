@@ -19,3 +19,10 @@ for i in range(3):
   cart.append(item)
 
 print("키미노 장바구니와 : ", cart)
+
+# 두 글자인 것만 출력하기
+fruits = ['사과', '바나나', '딸기', '망고', '수박', '블루베리']
+
+for f in fruits:
+  if len(f) == 2:
+    print(f, "두 글자 과일 !!!")

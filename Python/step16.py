@@ -7,3 +7,18 @@ students = [
 
 for s in students:
   print("이름:", s[0], "/ 점수:", s[1])
+
+print("")
+
+# 2단계: 중첩 for문
+# 리스트 안 리스트를 전부 돌리기
+scores = [
+  [90, 80, 100],
+  [88, 92, 76],
+  [95, 100, 98]
+]
+
+for row in scores:    # 학생별 점수 리스트를 하나씩 꺼냄
+  for s in row:       # 그 학생의 점수들을 하나씩 꺼냄
+    print("점수:", s)
+  print("---- 다음 학생 ----")

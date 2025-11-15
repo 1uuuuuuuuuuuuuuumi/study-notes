@@ -5,7 +5,7 @@ function Board(){
 
   return (
     <div className="game-container">
-      <h1>Puzzle Game</h1>
+      <h1>15 Puzzle Game</h1>
       <div className="board">
         {/* 여기에 타일들이 들어갈 예정 */}
         <div className="title">1</div>

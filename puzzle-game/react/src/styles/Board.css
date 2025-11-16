@@ -25,7 +25,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.title {
+.tile {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,17 +39,17 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.title:hover {
+.tile:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-.title.empty {
+.tile.empty {
   background: transparent;
   box-shadow: none;
   cursor: default;
 }
 
-.title.empty:hover {
+.tile.empty:hover {
   transform: none;
 }

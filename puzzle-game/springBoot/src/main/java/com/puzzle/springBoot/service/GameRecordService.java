@@ -9,11 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GameRecordService {
 
     private final GameRecordRepository gameRecordRepository;
+
+    // 생성자 직접 작성
+    public GameRecordService(GameRecordRepository gameRecordRepository){
+        this.gameRecordRepository = gameRecordRepository;
+    }
 
     // 게임 기록 저장
     @Transactional

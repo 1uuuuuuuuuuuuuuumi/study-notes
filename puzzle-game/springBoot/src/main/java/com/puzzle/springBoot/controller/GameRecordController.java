@@ -10,11 +10,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/records")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class GameRecordController {
 
     private final GameRecordService gameRecordService;
+
+    // 생성자 직접 작성
+    public GameRecordController(GameRecordService gameRecordService){
+        this.gameRecordService = gameRecordService;
+    }
 
     // 게임 기록 저장
     @PostMapping

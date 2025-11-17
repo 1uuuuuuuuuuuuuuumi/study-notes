@@ -1,17 +1,11 @@
 package com.puzzle.springBoot.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "game_records")
-@Getter
-@Setter
-@NoArgsConstructor
 public class GameRecord {
 
     @Id
@@ -33,5 +27,50 @@ public class GameRecord {
     @PrePersist
     protected void onCreate() {
         completedAt = LocalDateTime.now();
+    }
+
+    // 기본 생성자
+    public GameRecord(){
+    }
+
+    // Getter & Setter
+    public Long getId(){
+        return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public Integer getMoves() {
+        return moves;
+    }
+
+    public void setMoves(Integer moves) {
+        this.moves = moves;
+    }
+
+    public Integer getTimeSeconds() {
+        return timeSeconds;
+    }
+
+    public void setTimeSeconds(Integer timeSeconds) {
+        this.timeSeconds = timeSeconds;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
     }
 }

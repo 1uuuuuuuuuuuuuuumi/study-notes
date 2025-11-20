@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import '../styles/Board.css';
+import axios from "axios";
 
 function Board(){
   // 초기 타일 배치: 1~15 숫자와 빈 칸(null)
@@ -11,7 +12,23 @@ function Board(){
   ]);
 
   const [isWin, setIsWin] = useState(false);
-  const [isShuffled, setIsShuffled] = useState(false) // 섞였는지 추적
+  const [isShuffled, setIsShuffled] = useState(false); // 섞였는지 추적
+  const [moveCount, setMoveCount] = useState(0); // 이동 횟수
+  const [seconds, setSeconds] = useState(0); // 경과 시간
+  const [isPlaying, setIsPlaying] = useState(false); // 게임 진행 중
+  const [playerName, setPlayerName] = useState(''); // 플레이어 이름
+  const [showNameInput, setShowNameInput] = useState(false);  // 이름 입력창 표시
+
+  // 타이머
+  useEffect(() => {
+    let interval = null;
+    if(isPlaying && !isWin){
+      interval = setInterval(() => {
+        setSeconds(seconds => seconds + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, isWin]);
 
   // 타일 섞기 함수
   const shuffleTiles = () => {
@@ -35,6 +52,9 @@ function Board(){
     setTiles(shuffled);
     setIsWin(false);
     setIsShuffled(true);
+    setMoveCount(0);
+    setSeconds(0);
+    setIsPlaying(true);
   };
 
   // 이동 가능한 타일 찾기
@@ -75,9 +95,10 @@ function Board(){
   // 타일이 변경될 때마다 승리 체크 (섞인후에만)
   useEffect(() => {
     if(isShuffled && checkWin(tiles)){
+      setIsPlaying(false);
       setTimeout(() => {
         setIsWin(true);
-        alert('🎉 축하합니다! 퍼즐을 완성했어요 ☆٩(｡•ω<｡)و !');
+        setShowNameInput(true);
       }, 300);
     }
   }, [tiles, isShuffled]);
@@ -94,6 +115,7 @@ function Board(){
       const newTiles = [...tiles];
       [newTiles[index], newTiles[emptyIndex]] = [newTiles[emptyIndex], newTiles[index]];
       setTiles(newTiles);
+      setMoveCount(moveCount + 1);  // 이동 횟수 증가
     }
   };
 
@@ -111,9 +133,34 @@ function Board(){
     );
   };
 
+  // 게임 기록 저장
+  const saveGameRecord = async () => {
+    if(!playerName.trim()){
+      alert('이름을 입력해주세요!');
+      return;
+    }
+
+    try{
+      const response = await axios.post('http://localhost:8080/api/records', {
+        playerName: playerName,
+        moves: moveCount,
+        timeSeconds: seconds
+      });
+
+      console.log('기록 저장 성공: ', response.data);
+      alert('🎉 축하합니다 ${playerName}님! 기록이 저장되었습니다!');
+      setShowNameInput(false);
+    } catch (error) {
+      console.log('기록 저장 실패: ', error);
+      alert('기록 저장에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
   // 게임 리셋 함수
   const resetGame = () => {
     setIsShuffled(false);
+    setShowNameInput(false);
+    setPlayerName('');
     setTimeout(() => {
       shuffleTiles();
     }, 100);
@@ -122,7 +169,40 @@ function Board(){
   return (
     <div className="game-container">
       <h1>15 Puzzle Game</h1>
+
+      {/* 게임 통계 */}
+      <div className="game-stats">
+        <div className="stat">
+          <span className="stat-label">이동 횟수:</span>
+          <span className="stat-value">{moveCount}</span>
+        </div>
+        <div className="stat">
+          <span className="stat-label">시간:</span>
+          <span className="stat-value">{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}</span>
+        </div>
+      </div>
+
+      {/* 승리 메시지 */}
       {isWin && <div className="win-message">🎉 승리!</div>}
+
+      {/* 이름 입력 */}
+      {showNameInput && (
+        <div className="name-input-container">
+          <input 
+            type="text"
+            placeholder="이름을 입력하세요"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            className="name-input"
+            maxLength={20}
+          />
+          <button onClick={saveGameRecord} className="save-button">
+            기록 저장
+          </button>
+        </div>
+      )}
+
+      {/* 게임판 */}
       <div className="board">
         {tiles.map((tile, index) => (
           <div
@@ -134,6 +214,7 @@ function Board(){
           </div>
         ))}
       </div>
+      
       <button className="reset-button" onClick={resetGame}>
         다시 시작
       </button>

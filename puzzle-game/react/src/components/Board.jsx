@@ -148,7 +148,7 @@ function Board(){
       });
 
       console.log('기록 저장 성공: ', response.data);
-      alert('🎉 축하합니다 ${playerName}님! 기록이 저장되었습니다!');
+      alert('🎉 축하합니다' + playerName + '님! 기록이 저장되었습니다!');
       setShowNameInput(false);
     } catch (error) {
       console.log('기록 저장 실패: ', error);

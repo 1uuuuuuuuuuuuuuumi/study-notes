@@ -133,14 +133,26 @@ td {
   font-size: 0.9rem;
 }
 
-/* 반응형 */
+/* 반응형 디자인 */
 @media (max-width: 768px) {
+  .ranking-container {
+    padding: 1rem;
+  }
+
+  .ranking-container h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
   .tab-menu {
     flex-direction: column;
+    width: 100%;
   }
 
   .tab-button {
     width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
   }
 
   .ranking-table {
@@ -149,10 +161,71 @@ td {
   }
 
   table {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   th, td {
+    padding: 0.6rem 0.4rem;
+  }
+
+  .rank {
+    font-size: 1rem;
+  }
+
+  .medal {
+    font-size: 1.2rem;
+  }
+
+  .date {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ranking-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .tab-button {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .ranking-table {
     padding: 0.5rem;
+  }
+
+  table {
+    font-size: 0.75rem;
+  }
+
+  th, td {
+    padding: 0.5rem 0.3rem;
+  }
+
+  th {
+    font-size: 0.9rem;
+  }
+
+  .rank {
+    font-size: 0.9rem;
+  }
+
+  .medal {
+    font-size: 1rem;
+    margin-left: 0.2rem;
+  }
+
+  .player-name {
+    font-size: 0.85rem;
+  }
+
+  .date {
+    display: none; /* 작은 화면에서는 날짜 숨김 */
+  }
+
+  /* 날짜 컬럼도 숨김 */
+  thead th:last-child {
+    display: none;
   }
 }

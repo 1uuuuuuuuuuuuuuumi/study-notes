@@ -169,3 +169,111 @@ game-stats {
 .save-button:active {
   transform: translateY(0);
 }
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .game-container h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .game-stats {
+    flex-direction: row;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat {
+    padding: 0.6rem 1rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+
+  .board {
+    grid-template-columns: repeat(4, 70px);
+    grid-template-rows: repeat(4, 70px);
+    gap: 8px;
+    padding: 15px;
+  }
+
+  .tile {
+    font-size: 1.5rem;
+  }
+
+  .win-message {
+    font-size: 1.5rem;
+  }
+
+  .name-input-container {
+    flex-direction: column;
+    width: 100%;
+    padding: 0 1rem;
+  }
+
+  .name-input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .save-button {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+  }
+
+  .reset-button {
+    margin-top: 1.5rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* 작은 화면 (모바일) */
+@media (max-width: 480px) {
+  .game-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .game-stats {
+    gap: 0.5rem;
+  }
+
+  .stat {
+    padding: 0.5rem 0.8rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .board {
+    grid-template-columns: repeat(4, 60px);
+    grid-template-rows: repeat(4, 60px);
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .tile {
+    font-size: 1.3rem;
+  }
+
+  .win-message {
+    font-size: 1.2rem;
+  }
+
+  .reset-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}

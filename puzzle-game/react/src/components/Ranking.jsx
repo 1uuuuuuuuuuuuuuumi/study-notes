@@ -41,7 +41,25 @@ function Ranking() {
       setRecords(response.data);
     } catch (error) {
       console.error('데이터 조회 실패:', error);
-      alert('랭킹 데이터를 불러오는데 실패했습니다.');
+      
+      // 에러 타입별 처리
+      if (error.response) {
+        // 서버가 응답했지만 에러 상태 코드
+        if(error.response.status === 404){
+          alert('랭킹 데이터를 찾을 수 없습니다.')
+        } else {
+          alert('서버 오류가 발생했습니다. (상태:' + error.response.status + ')');
+        }
+      } else if (error.request) {
+        // 요청은 보냈지만 응답을 받지 못함
+        alert('서버와 연결할 수 없습니다. Spring Boot 서버가 실행 중인지 확인해주세요.');
+      } else {
+        // 요청 설정 중 에러 발생
+        alert('랭킹 데이터를 불러오는 중 오류가 발생했습니다.');
+      }
+
+      // 에러 발생 시 빈 배열로 설정
+      setRecords([]);
     }
     setLoading(false);
   }, []); // 빈 의존성 배열

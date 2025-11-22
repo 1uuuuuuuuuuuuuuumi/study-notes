@@ -163,8 +163,19 @@ function Board(){
       alert('🎉 축하합니다' + playerName + '님! 기록이 저장되었습니다!');
       setShowNameInput(false);
     } catch (error) {
-      console.log('기록 저장 실패: ', error);
-      alert('기록 저장에 실패했습니다. 다시 시도해주세요.');
+      console.error('기록 저장 실패: ', error);
+      
+      // 에러 타입별 처리
+      if (error.response) {
+        // 서버가 응답했지만 에러 상태 코드
+        alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요. (상태:' + error.response.status + ')');
+      } else if (error.request) {
+        // 요청은 보냈지만 응답을 받지 못함
+        alert('서버와 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
+      } else {
+        // 요청 설정 중 에러 발생
+        alert('기록 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
     }
   };
 

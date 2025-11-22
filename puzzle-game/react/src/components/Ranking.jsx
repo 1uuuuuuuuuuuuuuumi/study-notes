@@ -2,6 +2,24 @@ import React, { useCallback, useEffect, useState } from "react";
 import '../styles/Ranking.css'
 import axios from "axios";
 
+// 랭킹 행 컴포넌트 분리 (React.memo로 최적화)
+const RankingRow = React.memo(({ record, index, formatTime, formatDate }) => {
+  return (
+    <tr>
+      <td className="rank">
+        {index + 1}
+        {index === 0 && <span className="medal">🥇</span>}
+        {index === 1 && <span className="medal">🥈</span>}
+        {index === 2 && <span className="medal">🥉</span>}
+      </td>
+      <td className="player-name">{record.playerName}</td>
+      <td>{record.moves}</td>
+      <td>{formatTime(record.timeSeconds)}</td>
+      <td className="date">{formatDate(record.completedAt)}</td>
+    </tr>
+  );
+});
+
 function Ranking() {
   const [activeTab, setActiveTab] = useState('moves'); // 'moves', 'time', 'all'
   const [records, setRecords] = useState([]);
@@ -34,6 +52,7 @@ function Ranking() {
   }, [activeTab, fetchRecords]);  // fetchRecords 추가
 
   // 시간 포맷팅 (초 → 분:초)
+  // useCallback으로 함수 메모이제이션
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -92,18 +111,13 @@ function Ranking() {
               </thead>
               <tbody>
                 {records.map((record, index) => (
-                  <tr key={record.id}>
-                    <td className="rank">
-                      {index + 1}
-                      {index === 0 && <span className="medal">🥇</span>}
-                      {index === 1 && <span className="medal">🥈</span>}
-                      {index === 2 && <span className="medal">🥉</span>}
-                    </td>
-                    <td className="player-name">{record.playerName}</td>
-                    <td>{record.moves}</td>
-                    <td>{formatTime(record.timeSeconds)}</td>
-                    <td className="date">{formatDate(record.completedAt)}</td>
-                  </tr>
+                  <RankingRow 
+                    key={record.id}
+                    record={record}
+                    index={index}
+                    formatTime={formatTime}
+                    formatDate={formatDate}
+                  />
                 ))}
               </tbody>
             </table>

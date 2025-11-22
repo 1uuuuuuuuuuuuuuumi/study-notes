@@ -2,6 +2,18 @@ import React, { useEffect, useState } from "react";
 import '../styles/Board.css';
 import axios from "axios";
 
+// 타일 컴포넌트 분리 (React.memo로 최적화)
+const Tile = React.memo(({ tile, index, onClick }) => {
+  return (
+    <div
+      className={tile === null ? 'tile empty' : 'tile'}
+      onClick={() => onClick(index)}
+    >
+      {tile}
+    </div>
+  );
+});
+
 function Board(){
   // 초기 타일 배치: 1~15 숫자와 빈 칸(null)
   const [tiles, setTiles] = useState([
@@ -205,13 +217,12 @@ function Board(){
       {/* 게임판 */}
       <div className="board">
         {tiles.map((tile, index) => (
-          <div
+          <Tile 
             key={index}
-            className={tile === null ? 'tile empty' : 'tile'}
-            onClick={() => handleTileClick(index)}
-          >
-            {tile}
-          </div>
+            tile={tile}
+            index={index}
+            onClick={handleTileClick}
+          />
         ))}
       </div>
       

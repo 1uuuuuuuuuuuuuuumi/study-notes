@@ -71,6 +71,16 @@ function TodoList() {
     }
   };
 
+  // 중요 표시 토글
+  const toggleImportant = async (id) => {
+    try {
+      await axios.patch(`http://localhost:8080/api/todos/${id}/important`);
+      fetchTodos();
+    } catch (error) {
+      console.error('중요 표시 토글 실패:', error);
+    }
+  };
+
   return (
     <div>
       {/* 입력 폼 */}
@@ -83,6 +93,15 @@ function TodoList() {
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyPress}
         />
+        <select
+          className="category-select"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value={"개인"}>개인</option>
+          <option value={"업무"}>업무</option>
+          <option value={"학습"}>학습</option>
+        </select>
         <button className="add-button" onClick={addTodo}>
           ✨ 추가
         </button>
@@ -110,9 +129,19 @@ function TodoList() {
               <span className="todo-content">
                 {todo.completed ? '🎀' : '🌸'} {todo.content}
               </span>
+              {todo.important && (
+                <span className="important-badge" title="중요">⭐</span>
+              )}
               {todo.category && (
                 <span className="todo-category">{todo.category}</span>
               )}
+              <button
+                className="important-button"
+                onClick={() => toggleImportant(todo.id)}
+                title={todo.important ? '중요 해제' : '중요 표시'}
+              >
+                {todo.important ? '⭐' : '☆'}
+              </button>
               <button
                 className="delete-button"
                 onClick={() => deleteTodo(todo.id)}

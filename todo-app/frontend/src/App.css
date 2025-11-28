@@ -151,3 +151,63 @@ h1 {
   color: #999;
   font-size: 1.2rem;
 }
+
+/* 카테고리 선택 */
+.category-select {
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  border: 3px solid #C8B6FF;
+  border-radius: 20px;
+  outline: none;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  color: #8B5CF6;
+}
+
+.category-select:focus {
+  border-color: #8B5CF6;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+/* 중요 표시 버튼 */
+.important-button {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #FFF4B7 0%, #FFD700 100%);
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: all 0.3s ease;
+}
+
+.important-button:hover {
+  transform: scale(1.2) rotate(15deg);
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+}
+
+/* 중요 배지 */
+.important-badge {
+  animation: sparkle 1.5s infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* 카테고리 배지 색상 */
+.todo-category {
+  padding: 0.3rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+}
+
+/* 카테고리별 색상은 JavaScript로 동적 처리 예정 */

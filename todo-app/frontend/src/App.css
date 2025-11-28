@@ -211,3 +211,103 @@ h1 {
 }
 
 /* 카테고리별 색상은 JavaScript로 동적 처리 예정 */
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .todo-input-container {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .todo-input {
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  .category-select {
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  .add-button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+
+  .todo-item {
+    padding: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .todo-content {
+    font-size: 1rem;
+    flex: 1 1 100%;
+  }
+
+  .todo-category {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .important-button,
+  .delete-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .todo-input {
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .category-select {
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .add-button {
+    padding: 0.7rem;
+    font-size: 0.95rem;
+  }
+
+  .todo-item {
+    padding: 0.8rem;
+  }
+
+  .todo-content {
+    font-size: 0.95rem;
+  }
+
+  .empty-state {
+    padding: 2rem;
+    font-size: 1rem;
+  }
+}

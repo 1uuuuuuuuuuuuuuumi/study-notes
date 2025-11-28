@@ -5,14 +5,18 @@ function TodoList() {
   const [todos, setTodos] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [category, setCategory] = useState('개인');
+  const [loading, setLoading] = useState(false)
 
   // Todo 목록 가져오기
   const fetchTodos = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('http://localhost:8080/api/todos');
       setTodos(response.data);
     } catch (error) {
       console.error('Todo 목록 조회 실패:', error);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -28,6 +32,7 @@ function TodoList() {
       return;
     }
 
+    setLoading(true)
     try {
       await axios.post('http://localhost:8080/api/todos', {
         content: inputValue,
@@ -41,6 +46,7 @@ function TodoList() {
     } catch (error) {
       console.error('Todo 추가 실패:', error);
       alert('할 일 추가에 실패했어요 😢');
+      setLoading(false)
     }
   };
 
@@ -108,7 +114,12 @@ function TodoList() {
       </div>
 
       {/* Todo 리스트 */}
-      {todos.length === 0 ? (
+      {loading ? (
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>로딩 중 ... 🌸</p>
+        </div>
+      ) : todos.length === 0 ? (
         <div className="empty-state">
           할 일이 없어요! 🌸<br />
           새로운 할 일을 추가해보세요 !

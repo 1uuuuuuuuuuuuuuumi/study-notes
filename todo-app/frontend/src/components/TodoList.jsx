@@ -6,6 +6,8 @@ function TodoList() {
   const [inputValue, setInputValue] = useState('');
   const [category, setCategory] = useState('개인');
   const [loading, setLoading] = useState(false)
+  const [filter, setFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   // Todo 목록 가져오기
   const fetchTodos = async () => {
@@ -77,6 +79,25 @@ function TodoList() {
     }
   };
 
+  // 필터링된 Todo 목록
+  const getFilteredTodos = () => {
+    let filtered = [...todos];
+
+    // 완료 상태 필터
+    if(filter === 'completed'){
+      filtered = filtered.filter(todo => todo.completed);
+    } else if (filter === 'active') {
+      filtered = filtered.filter(todo => !todo.completed);
+    }
+
+    // 카테고리 필터
+    if(categoryFilter !== 'all'){
+      filtered = filtered.filter(todo => todo.category === categoryFilter);
+    }
+
+    return filtered;
+  };
+
   // 중요 표시 토글
   const toggleImportant = async (id) => {
     try {
@@ -113,6 +134,43 @@ function TodoList() {
         </button>
       </div>
 
+      {/* 필터 탭 */}
+      <div className="filter-container">
+        <div className="filter-tabs">
+          <button
+            className={filter === 'all' ? 'filter-tab active' : 'filter-tab'}
+            onClick={() => setFilter('all')}
+          >
+            전체 🌸
+          </button>
+          <button
+            className={filter === 'active' ? 'filter-tab active' : 'filter-tab'}
+            onClick={() => setFilter('active')}
+          >
+            미완료 ✨
+          </button>
+          <button
+            className={filter === 'completed' ? 'filter-tab active' : 'filter-tab'}
+            onClick={() => setFilter('completed')}
+          >
+            완료 🎀
+          </button>
+        </div>
+      
+        <div className="category-filter">
+          <select
+            className="filter-select"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="all">전체 카테고리</option>
+            <option value="개인">개인</option>
+            <option value="업무">업무</option>
+            <option value="학습">학습</option>
+          </select>
+        </div>
+      </div>
+
       {/* Todo 리스트 */}
       {loading ? (
         <div className="loading">
@@ -126,7 +184,7 @@ function TodoList() {
         </div>
       ) : (
         <ul className="todo-list">
-          {todos.map((todo) => (
+          {getFilteredTodos().map((todo) => (
             <li
               key={todo.id}
               className={todo.completed ? 'todo-item completed' : 'todo-item'}

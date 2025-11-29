@@ -126,6 +126,25 @@ function TodoList() {
     return filtered;
   };
 
+  // 통계 계산
+  const getStats = () => {
+    const total = todos.length;
+    const completed = todos.filter(todo => todo.completed).length;
+    const active = total - completed;
+    const important = todos.filter(todo => todo.important).length;
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return {
+      total,
+      completed,
+      active,
+      important,
+      completionRate
+    };
+  };
+
+  const stats = getStats();
+
   // 중요 표시 토글
   const toggleImportant = async (id) => {
     try {
@@ -160,6 +179,37 @@ function TodoList() {
         <button className="add-button" onClick={addTodo}>
           ✨ 추가
         </button>
+      </div>
+
+      {/* 통계 */}
+      <div className="stats-container">
+        <div className="stat-item">
+          <span className="stat-label">전체</span>
+          <span className="stat-value">{stats.total}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">완료</span>
+          <span className="stat-value completed">{stats.completed}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">미완료</span>
+          <span className="stat-value active">{stats.active}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">중요</span>
+          <span className="stat-value important">{stats.important}</span>
+        </div>
+        <div className="stat-item progress">
+          <span className="stat-label">달성률</span>
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${stats.completionRate}%` }}
+            >
+              {stats.completionRate}%
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 필터 탭 */}

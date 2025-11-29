@@ -8,6 +8,7 @@ function TodoList() {
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
 
   // Todo 목록 가져오기
   const fetchTodos = async () => {
@@ -29,8 +30,16 @@ function TodoList() {
 
   // Todo 추가
   const addTodo = async () => {
+    console.log('addTodo 호출됨!')
+
     if(!inputValue.trim()) {
       alert('할 일을 입력해주세요!');
+      return;
+    }
+
+    // 이미 로딩 중이면 리턴 (중복 실행 방지)
+    if(loading){
+      console.log('이미 로딩 중 !')
       return;
     }
 
@@ -55,6 +64,7 @@ function TodoList() {
   // Enter 키로 추가
   const handleKeyPress = (e) => {
     if(e.key === 'Enter') {
+      e.preventDefault();
       addTodo();
     }
   };
@@ -93,6 +103,24 @@ function TodoList() {
     // 카테고리 필터
     if(categoryFilter !== 'all'){
       filtered = filtered.filter(todo => todo.category === categoryFilter);
+    }
+
+    // 정렬
+    switch (sortBy) {
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      case 'oldest':
+        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        break;
+      case 'important':
+        filtered.sort((a, b) => {
+          if(a.important === b.important) return 0;
+          return a.important ? -1 : 1;
+        });
+        break;
+      default:
+        break;
     }
 
     return filtered;
@@ -157,7 +185,7 @@ function TodoList() {
           </button>
         </div>
       
-        <div className="category-filter">
+        <div className="filter-controls">
           <select
             className="filter-select"
             value={categoryFilter}
@@ -167,6 +195,16 @@ function TodoList() {
             <option value="개인">개인</option>
             <option value="업무">업무</option>
             <option value="학습">학습</option>
+          </select>
+
+          <select
+            className="filter-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="newest">최신순</option>
+            <option value="oldest">오래된순</option>
+            <option value="important">중요순</option>
           </select>
         </div>
       </div>

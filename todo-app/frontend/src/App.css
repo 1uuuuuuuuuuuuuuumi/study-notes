@@ -386,7 +386,9 @@ h1 {
 }
 
 /* 카테고리 필터 */
-.category-filter {
+.filter-controls {
+  display: flex;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -431,8 +433,9 @@ h1 {
     font-size: 0.9rem;
   }
 
-  .category-filter {
+  .filter-controls {
     width: 100%;
+    flex-direction: column;
   }
 
   .filter-select {

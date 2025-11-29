@@ -9,6 +9,7 @@ function TodoList() {
   const [filter, setFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Todo 목록 가져오기
   const fetchTodos = async () => {
@@ -89,9 +90,16 @@ function TodoList() {
     }
   };
 
-  // 필터링된 Todo 목록
+  // 필터링 및 정렬된 Todo 목록
   const getFilteredTodos = () => {
     let filtered = [...todos];
+
+    // 검색 필터
+    if(searchQuery.trim()){
+      filtered = filtered.filter(todo =>
+        todo.content.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
     // 완료 상태 필터
     if(filter === 'completed'){
@@ -210,6 +218,25 @@ function TodoList() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 검색창 */}
+      <div className="search-container">
+        <input 
+          type="text"
+          className="search-input"
+          placeholder="할 일 검색... 🔍"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <button
+            className="search-clear"
+            onClick={() => setSearchQuery('')}
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* 필터 탭 */}

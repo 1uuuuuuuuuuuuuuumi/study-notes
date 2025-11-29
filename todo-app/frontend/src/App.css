@@ -549,3 +549,67 @@ h1 {
     font-size: 0.85rem;
   }
 }
+
+/* 검색 컨테이너 */
+.search-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 3rem 1rem 1.5rem;
+  font-size: 1.1rem;
+  border: 3px solid #B4E4FF;
+  border-radius: 20px;
+  outline: none;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.search-input:focus {
+  border-color: #64B5F6;
+  box-shadow: 0 0 15px rgba(100, 181, 246, 0.3);
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+.search-clear {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #FF6B6B;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 1.3s ease;
+}
+
+.search-clear:hover {
+  background: #FF5252;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* 반응형 - 검색 */
+@media (max-width: 768px) {
+  .search-input {
+    padding: 0.8rem 2.5rem 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  .search-clear {
+    width: 25px;
+    height: 25px;
+    font-size: 1rem;
+  }
+}

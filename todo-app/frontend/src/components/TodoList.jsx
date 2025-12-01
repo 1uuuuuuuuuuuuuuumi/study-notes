@@ -3,24 +3,24 @@ import React, { useEffect, useState } from "react";
 
 function TodoList() {
   const [todos, setTodos] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [category, setCategory] = useState('개인');
-  const [loading, setLoading] = useState(false)
-  const [filter, setFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [inputValue, setInputValue] = useState("");
+  const [category, setCategory] = useState("개인");
+  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Todo 목록 가져오기
   const fetchTodos = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8080/api/todos');
+      const response = await axios.get("http://localhost:8080/api/todos");
       setTodos(response.data);
     } catch (error) {
-      console.error('Todo 목록 조회 실패:', error);
+      console.error("Todo 목록 조회 실패:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -31,40 +31,40 @@ function TodoList() {
 
   // Todo 추가
   const addTodo = async () => {
-    console.log('addTodo 호출됨!')
+    console.log("addTodo 호출됨!");
 
-    if(!inputValue.trim()) {
-      alert('할 일을 입력해주세요!');
+    if (!inputValue.trim()) {
+      alert("할 일을 입력해주세요!");
       return;
     }
 
     // 이미 로딩 중이면 리턴 (중복 실행 방지)
-    if(loading){
-      console.log('이미 로딩 중 !')
+    if (loading) {
+      console.log("이미 로딩 중 !");
       return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      await axios.post('http://localhost:8080/api/todos', {
+      await axios.post("http://localhost:8080/api/todos", {
         content: inputValue,
         completed: false,
         important: false,
-        category: category
+        category: category,
       });
 
-      setInputValue('');
+      setInputValue("");
       fetchTodos(); // 목록 새로고침
     } catch (error) {
-      console.error('Todo 추가 실패:', error);
-      alert('할 일 추가에 실패했어요 😢');
-      setLoading(false)
+      console.error("Todo 추가 실패:", error);
+      alert("할 일 추가에 실패했어요 😢");
+      setLoading(false);
     }
   };
 
   // Enter 키로 추가
   const handleKeyPress = (e) => {
-    if(e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       addTodo();
     }
@@ -76,7 +76,7 @@ function TodoList() {
       await axios.patch(`http://localhost:8080/api/todos/${id}/complete`);
       fetchTodos();
     } catch (error) {
-      console.error('완료 토글 실패:', error);
+      console.error("완료 토글 실패:", error);
     }
   };
 
@@ -86,7 +86,7 @@ function TodoList() {
       await axios.delete(`http://localhost:8080/api/todos/${id}`);
       fetchTodos();
     } catch (error) {
-      console.error('Todo 삭제 실패:', error);
+      console.error("Todo 삭제 실패:", error);
     }
   };
 
@@ -95,35 +95,35 @@ function TodoList() {
     let filtered = [...todos];
 
     // 검색 필터
-    if(searchQuery.trim()){
-      filtered = filtered.filter(todo =>
+    if (searchQuery.trim()) {
+      filtered = filtered.filter((todo) =>
         todo.content.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     // 완료 상태 필터
-    if(filter === 'completed'){
-      filtered = filtered.filter(todo => todo.completed);
-    } else if (filter === 'active') {
-      filtered = filtered.filter(todo => !todo.completed);
+    if (filter === "completed") {
+      filtered = filtered.filter((todo) => todo.completed);
+    } else if (filter === "active") {
+      filtered = filtered.filter((todo) => !todo.completed);
     }
 
     // 카테고리 필터
-    if(categoryFilter !== 'all'){
-      filtered = filtered.filter(todo => todo.category === categoryFilter);
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter((todo) => todo.category === categoryFilter);
     }
 
     // 정렬
     switch (sortBy) {
-      case 'newest':
+      case "newest":
         filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         break;
-      case 'oldest':
+      case "oldest":
         filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
         break;
-      case 'important':
+      case "important":
         filtered.sort((a, b) => {
-          if(a.important === b.important) return 0;
+          if (a.important === b.important) return 0;
           return a.important ? -1 : 1;
         });
         break;
@@ -137,17 +137,18 @@ function TodoList() {
   // 통계 계산
   const getStats = () => {
     const total = todos.length;
-    const completed = todos.filter(todo => todo.completed).length;
+    const completed = todos.filter((todo) => todo.completed).length;
     const active = total - completed;
-    const important = todos.filter(todo => todo.important).length;
-    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const important = todos.filter((todo) => todo.important).length;
+    const completionRate =
+      total > 0 ? Math.round((completed / total) * 100) : 0;
 
     return {
       total,
       completed,
       active,
       important,
-      completionRate
+      completionRate,
     };
   };
 
@@ -159,7 +160,7 @@ function TodoList() {
       await axios.patch(`http://localhost:8080/api/todos/${id}/important`);
       fetchTodos();
     } catch (error) {
-      console.error('중요 표시 토글 실패:', error);
+      console.error("중요 표시 토글 실패:", error);
     }
   };
 
@@ -167,7 +168,7 @@ function TodoList() {
     <div>
       {/* 입력 폼 */}
       <div className="todo-input-container">
-        <input 
+        <input
           type="text"
           className="todo-input"
           placeholder="오늘 할 일을 입력하세요 ✨"
@@ -222,7 +223,7 @@ function TodoList() {
 
       {/* 검색창 */}
       <div className="search-container">
-        <input 
+        <input
           type="text"
           className="search-input"
           placeholder="할 일 검색... 🔍"
@@ -230,10 +231,7 @@ function TodoList() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         {searchQuery && (
-          <button
-            className="search-clear"
-            onClick={() => setSearchQuery('')}
-          >
+          <button className="search-clear" onClick={() => setSearchQuery("")}>
             ✕
           </button>
         )}
@@ -243,25 +241,27 @@ function TodoList() {
       <div className="filter-container">
         <div className="filter-tabs">
           <button
-            className={filter === 'all' ? 'filter-tab active' : 'filter-tab'}
-            onClick={() => setFilter('all')}
+            className={filter === "all" ? "filter-tab active" : "filter-tab"}
+            onClick={() => setFilter("all")}
           >
             전체 🌸
           </button>
           <button
-            className={filter === 'active' ? 'filter-tab active' : 'filter-tab'}
-            onClick={() => setFilter('active')}
+            className={filter === "active" ? "filter-tab active" : "filter-tab"}
+            onClick={() => setFilter("active")}
           >
             미완료 ✨
           </button>
           <button
-            className={filter === 'completed' ? 'filter-tab active' : 'filter-tab'}
-            onClick={() => setFilter('completed')}
+            className={
+              filter === "completed" ? "filter-tab active" : "filter-tab"
+            }
+            onClick={() => setFilter("completed")}
           >
             완료 🎀
           </button>
         </div>
-      
+
         <div className="filter-controls">
           <select
             className="filter-select"
@@ -294,7 +294,8 @@ function TodoList() {
         </div>
       ) : todos.length === 0 ? (
         <div className="empty-state">
-          할 일이 없어요! 🌸<br />
+          할 일이 없어요! 🌸
+          <br />
           새로운 할 일을 추가해보세요 !
         </div>
       ) : (
@@ -302,19 +303,21 @@ function TodoList() {
           {getFilteredTodos().map((todo) => (
             <li
               key={todo.id}
-              className={todo.completed ? 'todo-item completed' : 'todo-item'}
+              className={todo.completed ? "todo-item completed" : "todo-item"}
             >
-              <input 
+              <input
                 type="checkbox"
                 className="todo-checkbox"
                 checked={todo.completed}
                 onChange={() => toggleComplete(todo.id)}
               />
               <span className="todo-content">
-                {todo.completed ? '🎀' : '🌸'} {todo.content}
+                {todo.completed ? "🎀" : "🌸"} {todo.content}
               </span>
               {todo.important && (
-                <span className="important-badge" title="중요">⭐</span>
+                <span className="important-badge" title="중요">
+                  ⭐
+                </span>
               )}
               {todo.category && (
                 <span className="todo-category">{todo.category}</span>
@@ -322,9 +325,9 @@ function TodoList() {
               <button
                 className="important-button"
                 onClick={() => toggleImportant(todo.id)}
-                title={todo.important ? '중요 해제' : '중요 표시'}
+                title={todo.important ? "중요 해제" : "중요 표시"}
               >
-                {todo.important ? '⭐' : '☆'}
+                {todo.important ? "⭐" : "☆"}
               </button>
               <button
                 className="delete-button"

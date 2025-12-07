@@ -9,7 +9,7 @@ const users = [
         email: "java@new.world",
         age: 25,
         isActive: true,
-        skills: ["TypeScript", "React", "Spring Boot"]
+        skills: ["TypeScript", "React", "Spring Boot"],
     },
     {
         id: 2,
@@ -17,7 +17,7 @@ const users = [
         email: "lee@coding.com",
         age: 27,
         isActive: true,
-        skills: ["JavaScript", "Node.js", "MongoDB"]
+        skills: ["JavaScript", "Node.js", "MongoDB"],
     },
     {
         id: 3,
@@ -25,7 +25,7 @@ const users = [
         email: "D@jango.com",
         age: 30,
         isActive: false,
-        skills: ["Python", "Django", "PostgreSQL"]
+        skills: ["Python", "Django", "PostgreSQL"],
     },
     {
         id: 4,
@@ -33,29 +33,29 @@ const users = [
         email: "maruko@kyuusai.com",
         age: 9,
         isActive: true,
-        skills: ["Java", "Spring", "MySQL"]
-    }
+        skills: ["Java", "Spring", "MySQL"],
+    },
 ];
 // 3. 기능 함수들
 // 전체 사용자 출력
 function printAllUsers(users) {
     console.log("=== 전체 사용자 목록 ===");
-    users.forEach(user => {
+    users.forEach((user) => {
         const status = user.isActive ? "활성" : "비활성";
         console.log(`[${status}] ${user.name} (${user.age}세) - ${user.email}`);
     });
 }
 // 활성 사용자만 필터링
 function getActiveUsers(users) {
-    return users.filter(user => user.isActive);
+    return users.filter((user) => user.isActive);
 }
 // ID로 사용자 찾기
 function findUserById(users, id) {
-    return users.find(user => user.id === id);
+    return users.find((user) => user.id === id);
 }
 // 특정 스킬을 가진 사용자 찾기
 function findUsersBySkill(users, skill) {
-    return users.filter(user => user.skills.some(s => s.toLowerCase().includes(skill.toLowerCase())));
+    return users.filter((user) => user.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase())));
 }
 // 평균 나이 계산
 function getAverageAge(users) {
@@ -77,7 +77,7 @@ printAllUsers(users);
 // 활성 사용자만
 console.log("\n=== 활성 사용자 ===");
 const activeUsers = getActiveUsers(users);
-activeUsers.forEach(user => console.log(`- ${user.name}`));
+activeUsers.forEach((user) => console.log(`- ${user.name}`));
 // ID로 찾기
 console.log("\n=== ID로 사용자 찾기 ===");
 const user = findUserById(users, 1);
@@ -90,7 +90,7 @@ else {
 // TypeScript 스킬 보유자 찾기
 console.log("\n=== TypeScript 스킬 보유자 ===");
 const tsUsers = findUsersBySkill(users, "TypeScript");
-tsUsers.forEach(user => console.log(`- ${user.name}: ${user.skills.join(", ")}`));
+tsUsers.forEach((user) => console.log(`- ${user.name}: ${user.skills.join(", ")}`));
 // 평균 나이
 console.log("\n=== 통계 ===");
 console.log(`전체 사용자 수: ${users.length}명`);

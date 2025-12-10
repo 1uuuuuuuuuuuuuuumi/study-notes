@@ -134,7 +134,7 @@ printTodos(getTodos(currentState));
 // 할 일 완료 처리
 console.log("\n\n3️⃣ 첫 번째 할 일 완료!");
 const firstTodoId = currentState.todos[0]?.id || 0;
-//명확한 버전
+// 첫번째 명확한 버전
 // if(currentState.todos.length > 0){
 //   const firstTodoId = currentState.todos[0]?.id;
 //   currentState = reducer(currentState, {
@@ -142,6 +142,8 @@ const firstTodoId = currentState.todos[0]?.id || 0;
 //     id: firstTodoId
 //   });
 // }
+// 두번째 간단한 버전
+// const firstTodoId = currentState.todos[0]!.id;
 currentState = reducer(currentState, {
     type: "TOGGLE_TODO",
     id: firstTodoId

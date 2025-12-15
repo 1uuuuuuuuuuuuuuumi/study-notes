@@ -1,26 +1,36 @@
-// Day 7: React 시작!
-// 첫 번째 컴포넌트
 
+// Props 인터페이스 정의
+interface GreetingProps {
+  name: string;
+  age: number;
+}
+
+// Greeting 컴포넌트
+function Greeting(props: GreetingProps) {
+  return (
+    <div style={{
+      padding: "20px",
+      margin: "10px",
+      border: "2px solid #4CAF50",
+      borderRadius: "8px"
+    }}>
+      <h2>안녕하세요! {props.name}님!</h2>
+      <p>나이: {props.age}세</p>
+    </div>
+  );
+}
+
+
+// App 컴포넌트
 function App() {
-  // JavaScript 변수
-  const name = "김자바";
-  const age = 25;
-  const skills = ["TypeScript", "JavaScript", "React"];
 
   return (
-    <div style={{padding: "20px", fontFamily:"Arial"}}>
-      <h1>🎉 {name}의 자기소개</h1>
+    <div style={{padding: "20px"}}>
+      <h1>🎉 Props 배우기</h1>
 
-      <p>나이: {age}세</p>
-
-      <h2>보유 스킬:</h2>
-      <ul>
-        {skills.map((skill) => (
-          <li key={skill}>{skill}</li>
-        ))}
-      </ul>
-
-      <p>오늘 배운 것: React 컴포넌트!</p>
+      <Greeting name="김자바" age={25} />
+      <Greeting name="이파이썬" age={28} />
+      <Greeting name="박리액트" age={30} />
     </div>
   );
 }

@@ -1,105 +1,172 @@
 import { useState } from "react";
 
+interface Todo {
+  id: number;
+  text: string;
+  completed: boolean;
+}
+
 function App() {
-  // useState: [현재값, 변경함수] = useState(초기값)
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [inputText, setInputText] = useState("");
+
+  // 할 일 추가
+  const addTodo = () => {
+    if(inputText.trim() === "") return;
+
+    const newTodo: Todo = {
+      id: Date.now(),
+      text: inputText,
+      completed: false
+    };
+
+    setTodos([...todos, newTodo]);
+    setInputText("");
+  };
+
+  // 완료 토글
+  const toggleTodo = (id: number) => {
+    setTodos(todos.map(todo =>
+      todo.id === id
+        ? {...todo, completed: !todo.completed}
+        : todo
+    ));
+  };
+
+  // 삭제
+  const deleteTodo = (id: number) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+  };
 
   return (
     <div style={{
       padding: "40px",
       maxWidth: "600px",
       margin: "0 auto",
-      fontFamil: "Arial"
+      fontFamily: "Arial"
     }}>
-      <h1>📝 입력 폼</h1>
+      <h1>✅ Todo List</h1>
 
-      {/* 이름 입력 */}
-      <div style={{marginBottom: "20px"}}>
-        <label style={{display: "block", marginBottom: "5px", fontWeight: "bold"}}>
-          이름:
-        </label>
-        <input
+      {/* 입력 영역 */}
+      <div style={{
+        display: "flex",
+        gap: "10px",
+        marginBottom: "20px"
+      }}>
+        <input 
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="이름을 입력하세요"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyDown={(e) => {
+            if(e.key === "Enter" && !e.nativeEvent.isComposing) {
+              addTodo();
+            }
+          }}
+          placeholder="할 일을 입력하세요"
           style={{
-            width: "100%",
-            padding: "10px",
+            flex: 1,
+            padding: "12px",
             fontSize: "16px",
             border: "2px solid #ddd",
             borderRadius: "5px"
           }}
         />
-      </div>
-
-      {/* 나이 입력 */}
-      <div style={{marginBottom: "20px"}}>
-        <label style={{display: "block", marginBottom: "5px", fontWeight: "bold"}}>
-          나이:
-        </label>
-        <input
-          type="num"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          placeholder="나이를 입력하세요"
+        <button 
+          onClick={addTodo}
           style={{
-            width: "100%",
-            padding: "10px",
+            padding: "12px 24px",
             fontSize: "16px",
-            border: "2px solid #ddd",
-            borderRadius: "5px"
-          }}
-        />
-
-        {/* 결과 표시 */}
-        <div style={{
-          padding: "20px",
-          backgroundColor: "#f0f0f0",
-          borderRadius: "10px",
-          marginTop: "20px"
-        }}>
-          <h2>👤 입력한 정보:</h2>
-          <p style={{fontSize: "18px"}}>
-            이름: <strong>{name || "(입력 안 함)"}</strong>
-          </p>
-          <p style={{fontSize: "18px"}}>
-            나이: <strong>{age || "(입력 안 함)"}</strong>세
-          </p>
-
-          {name && age && (
-            <p style={{
-              marginTop: "15px",
-              padding: "10px",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              borderRadius: "5px"
-            }}>
-              ✅ {name}님, {age}세 입력 완료!
-            </p>
-          )}
-        </div>
-
-        {/* 리셋 버튼 */}
-        <button
-          onClick={() => {
-            setName("");
-            setAge("");
-          }}
-          style={{
-            marginTop: "20px",
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: "#f44336",
+            backgroundColor: "#4CAF50",
             color: "white",
             border: "none",
             borderRadius: "5px",
             cursor: "pointer"
           }}
         >
-          🔄 초기화
+          추가
         </button>
+      </div>
+
+      {/* 통계 */}
+      <div style={{
+        padding: "15px",
+        backgroundColor: "#f0f0f0",
+        borderRadius: "8px",
+        marginBottom: "20px"
+      }}>
+        <p style={{margin: 0}}>
+          전체: {todos.length}개 |
+          완료: {todos.filter(t => t.completed).length}개 |
+          남은 것: {todos.filter(t => !t.completed).length}개
+        </p>
+      </div>
+
+      {/* Todo 목록 */}
+      <div>
+        {todos.length === 0 ? (
+          <p style={{
+            textAlign: "center",
+            color: "#999",
+            padding: "40px"
+          }}>
+            할 일이 없습니다! 추가해보세요 😊
+          </p>
+        ) : (
+          todos.map(todo => (
+            <div
+              key={todo.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "15px",
+                marginBottom: "10px",
+                backgroundColor: todo.completed ? "#e8f5e9" : "white",
+                border: "2px solid #ddd",
+                borderRadius: "8px"
+              }}
+            >
+              {/* 체크박스 */}
+              <input 
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => toggleTodo(todo.id)}
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  cursor: "pointer"
+                }}
+              />
+
+              {/* 텍스트 */}
+              <span 
+                style={{
+                  flex: 1,
+                  fontSize: "18px",
+                  textDecoration: todo.completed ? "line-through" : "none",
+                  color: todo.completed ? "#999" : "#000"
+                }}
+              >
+                {todo.text}
+              </span>
+
+              {/* 삭제 버튼 */}
+              <button
+                onClick={() => deleteTodo(todo.id)}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#f44336",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer"
+                }}
+              >
+                🗑️ 삭제
+              </button>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

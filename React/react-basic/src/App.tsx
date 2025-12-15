@@ -1,21 +1,30 @@
 
-// Props 인터페이스 정의
-interface GreetingProps {
+interface UserCardProps {
   name: string;
   age: number;
+  job: string;
+  skills: string[];
 }
 
-// Greeting 컴포넌트
-function Greeting(props: GreetingProps) {
+// 구조 분해 할당 사용! (더 깔끔)
+function UserCard({name, age, job, skills}: UserCardProps) {
   return (
     <div style={{
       padding: "20px",
       margin: "10px",
-      border: "2px solid #4CAF50",
-      borderRadius: "8px"
+      backgroundColor: "#f0f0f0",
+      borderRadius: "10px",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
     }}>
-      <h2>안녕하세요! {props.name}님!</h2>
-      <p>나이: {props.age}세</p>
+      <h2>👤 {name}</h2>
+      <p>📅 {age}세</p>
+      <p>💼 {job}</p>
+      <h3>🛠️ 보유 스킬:</h3>
+      <ul>
+        {skills.map((skill) => (
+          <li key={skill}>{skill}</li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -25,12 +34,29 @@ function Greeting(props: GreetingProps) {
 function App() {
 
   return (
-    <div style={{padding: "20px"}}>
-      <h1>🎉 Props 배우기</h1>
+    <div style={{padding: "20px", maxWidth: "800px", margin:"0 auto"}}>
+      <h1>🚀 팀원 소개</h1>
 
-      <Greeting name="김자바" age={25} />
-      <Greeting name="이파이썬" age={28} />
-      <Greeting name="박리액트" age={30} />
+      <UserCard 
+        name="김자바"
+        age={25}
+        job="백엔드 개발자"
+        skills={["Java", "Spring Boot", "MySQL"]}
+      />
+
+      <UserCard 
+        name="이리액트"
+        age={27}
+        job="프론트엔드 개발자"
+        skills={["React", "TypeScript", "CSS"]}
+      />
+
+      <UserCard
+        name="박풀스택"
+        age={30}
+        job="풀스택 개발자"
+        skills={["React", "Node.js", "PostgreSQL", "Docker"]}
+      />
     </div>
   );
 }

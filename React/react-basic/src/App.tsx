@@ -1,91 +1,46 @@
-import { useEffect, useState } from "react";
-
-interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
-}
+import { useRef, useState } from "react";
 
 function App() {
-  // localStorage에서 불러오기 (초기값)
-  const [todos, setTodos] = useState<Todo[]>(() => {
-    const saved = localStorage.getItem('todos');
-    if(saved){
-      return JSON.parse(saved);
-    }
-    return [];
-  });
-  
-  const [inputText, setInputText] = useState("");
+  // useState: 변경 시 리렌더링 O
+  const [count, setCount] = useState(0);
 
-  // todos가 바뀔 때마다 localStorage에 저장!
-  useEffect(() => {
-    console.log("💾 localStorage에 저장!");
-    localStorage.setItem('todos', JSON.stringify(todos));
-  }, [todos]);
+  // useRef: 변경해도 리렌더링 X
+  const countRef = useRef(0);
 
-  const addTodo = () => {
-    if(inputText.trim() === "") return;
-
-    const newTodo: Todo = {
-      id: Date.now(),
-      text: inputText,
-      completed: false
-    };
-
-    setTodos([...todos, newTodo]);
-    setInputText("");
-  };
-
-  const toggleTodo = (id: number) => {
-    setTodos(todos.map(todo =>
-      todo.id === id
-        ? {...todo, completed : !todo.completed}
-        : todo
-    ));
-  };
-
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter(todo => todo.id !== id));
-  };
+  // 렌더링 횟수 카운트
+  const renderCount = useRef(0);
+  renderCount.current += 1;
 
   return (
-    <div style={{
-      padding: "40px",
-      maxWidth: "600px",
-      margin: "0 auto",
-      fontFamily: "Arial"
-    }}>
-      <h1>✅ Todo List (저장 기능!)</h1>
+    <div style={{padding: "40px", fontFamily: "Arial"}}>
+      <h1>🎯 useState vs useRef</h1>
 
-      {/* 입력 영역 */}
       <div style={{
-        display: "flex",
-        gap: "10px",
+        padding: "20px",
+        backgroundColor: "#f0f0f0",
+        borderRadius: "8px",
         marginBottom: "20px"
       }}>
-        <input 
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => {
-            if(e.key === "Enter" && !e.nativeEvent.isComposing){
-              addTodo();
-            }
-          }}
-          placeholder="할 일을 입력하세요"
-          style={{
-            flex: 1,
-            padding: "12px",
-            fontSize: "16px",
-            border: "2px solid #ddd",
-            borderRadius: "5px"
-          }}
-        />
+        <p style={{fontSize: "18px", margin: "10px 0"}}>
+          🔄 렌더링 횟수: <strong>{renderCount.current}</strong>
+        </p>
+      </div>
+
+      {/* useState */}
+      <div style={{
+        padding: "20px",
+        border: "2px solid #4CAF50",
+        borderRadius: "8px",
+        marginBottom: "20px"
+      }}>
+        <h2>✨ useState (리렌더링 O)</h2>
+        <p style={{fontSize: "24px", fontWeight: "bold"}}>
+          Count: {count}
+        </p>
         <button
-          onClick={addTodo}
+          onClick={() => setCount(count + 1)}
           style={{
-            padding: "12px 24px",
+            padding: "10px 20px",
             fontSize: "16px",
             backgroundColor: "#4CAF50",
             color: "white",
@@ -94,102 +49,53 @@ function App() {
             cursor: "pointer"
           }}
         >
-          추가
+          ➕ useState 증가 (리렌더링 됨!)
         </button>
       </div>
 
-      {/* 통계 */}
+      {/* useRef */}
       <div style={{
-        padding: "15px",
-        backgroundColor: "#f0f0f0",
+        padding: "20px",
+        border: "2px solid #2196F3",
         borderRadius: "8px",
         marginBottom: "20px"
       }}>
-        <p style={{margin: 0}}>
-          전체:{todos.length}개 |
-          완료: {todos.filter(t => t.completed).length}개 |
-          남은 것: {todos.filter(t => !t.completed).length}개
+        <h2>🎯 useRef (리렌더링 X)</h2>
+        <p style={{fontSize: "24px", fontWeight: "bold"}}>
+          CountRef: {countRef.current}
         </p>
+        <button
+          onClick={() => {
+            countRef.current += 1;
+            console.log("countRef:", countRef.current);
+            alert(`countRef는 ${countRef.current}인데!! 화면은 안 바뀜!`);
+          }}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16opx",
+            backgroundColor: "#2196F3",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          ➕ useRef 증가 (리렌더링 안 됨!)
+        </button>
       </div>
 
-      {/* Todo 목록 */}
-      <div>
-        {todos.length === 0 ? (
-          <p style={{
-            textAlign: "center",
-            color: "#999",
-            padding: "40px"
-          }}>
-            할 일이 없습니다! 추가해보세요 😊
-          </p>
-        ) : (
-          todos.map(todo => (
-            <div
-              key={todo.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "15px",
-                marginBottom: "10px",
-                backgroundColor: todo.completed ? "#e8f5e9" : "white",
-                border: "2px solid #ddd",
-                borderRadius: "8px"
-              }}
-            >
-              <input 
-                type="checkbox"
-                checked={todo.completed}
-                onChange={() => toggleTodo(todo.id)}
-                style={{
-                  width: "20px",
-                  height: "20px",
-                  cursor: "pointer"
-                }}
-              />
-
-              <span
-                style={{
-                  flex: 1,
-                  fontSize: "18px",
-                  textDecoration: todo.completed ? "line-through" : "none",
-                  color: todo.completed ? "#999" : "#000"
-                }}
-              >
-                {todo.text}
-              </span>
-
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#f44336",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer"
-                }}
-              >
-                🗑️ 삭제
-              </button>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* 설명 */}
+      {/* 비교 */}
       <div style={{
-        marginTop: "30px",
-        padding: "15px",
+        padding: "20px",
         backgroundColor: "#fff3cd",
         borderRadius: "8px"
       }}>
-        <h3>💾 저장 기능!</h3>
+        <h3>📝 차이점</h3>
         <ul style={{textAlign: "left"}}>
-          <li>Todo 추가/완료/삭제하면 자동 저장!</li>
-          <li>새로고침해도 유지됨!</li>
-          <li>F12 → Console 탭에서 "💾 localStorage에 저장!" 확인!</li>
-          <li>F12 → Application 탭 → Local Storage 에서 직접 확인 가능!</li>
+          <li><strong>useState</strong>: 값 변경 → 리렌더링 → 화면 업데이트 ✅</li>
+          <li><strong>useRef</strong>: 값 변경 → 리렌더링 X → 화면 그대로 ❌</li>
+          <li><strong>useRef</strong>: 값은 변했지만 화면은 안 바뀜!</li>
+          <li>렌더링 횟수는 useRef로 세는 게 정확!</li>
         </ul>
       </div>
     </div>

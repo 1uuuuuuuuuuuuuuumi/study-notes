@@ -1,65 +1,92 @@
 import { useEffect, useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [name, setName] = useState("");
+  const [seconds, setSeconds] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
 
-  // 패턴 1: 의존성 배열 없음 - 매번 실행
   useEffect(() => {
-    console.log("🔴 매번 실행!");
-  });
+    console.log("useEffect 실행! isRunning:", isRunning);
 
-  // 패턴 2: 빈 배열 - 한 번만 실행
-  useEffect(() => {
-    console.log("🟢 처음 한 번만!");
-  }, []);
+    if(!isRunning){
+      console.log("타이머 멈춤 상태");
+      return; // 타이머 안 돌림
+    }
 
-  // 패턴 3: count만 감시
-  useEffect(() => {
-    console.log("🔵 count 변경:", count);
-  }, [count]);
+    console.log("타이머 시작!");
 
-  // 패턴 4: name만 감시
-  useEffect(() => {
-    console.log("🟡 name 변경", name);
-  }, [name]);
+    // setInterval: 1초마다 실행
+    const timer = setInterval(() => {
+      console.log("1초 경과!");
+      setSeconds(prev => prev + 1);
+    }, 1000);
+
+    // cleanup 함수!
+    return () => {
+      console.log("타이머 정리!");
+      clearInterval(timer);
+    };
+  }, [isRunning]);  // isRunning이 바뀔 때만!
 
   return (
-    <div style={{padding:"40px", maxWidth: "600px", margin: "0 auto"}}>
-      <h1>🎯 useEffect 의존성 배열</h1>
+    <div style={{
+      padding: "40px",
+      textAlign: "center",
+      fontFamily: "Arial"
+    }}>
+      <h1>⏰ 타이머</h1>
 
-      {/* 카운터 */}
-      <div style={{marginBottom: "30px", padding: "20px", backgroundColor: "#f0f0f0", borderRadius: "8px"}}>
-        <h2>카운터: {count}</h2>
+      <div style={{
+        fontSize: "72px",
+        fontWeight: "bold",
+        margin: "40px 0",
+        color: isRunning ? "#4CAF50" : "#999"
+      }}>
+        {seconds}초
+      </div>
+
+      <div style={{display: "flex", gap: "10px", justifyContent: "center"}}>
         <button
-          onClick={() => setCount(count + 1)}
-          style={{padding: "10px 20px", fontSize: "16px", cursor: "pointer"}}
+          onClick={() => setIsRunning(!isRunning)}
+          style={{
+            padding: "15px 30px",
+            fontSize: "20px",
+            backgroundColor: isRunning ? "#f44336" : "#4CAF50",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer"
+          }}
         >
-          ➕ count 증가
+          {isRunning ? "⏸️ 정지" : "▶️ 시작"}
+        </button>
+
+        <button
+          onClick={() => {
+            setSeconds(0);
+            setIsRunning(false);
+          }}
+          style={{
+            padding: "15px 30px",
+            fontSize: "20px",
+            backgroundColor: "#2196F3",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer"
+          }}
+        >
+          🔄 리셋
         </button>
       </div>
 
-      {/* 이름 입력 */}
-      <div style={{marginBottom: "30px", padding: "20px", backgroundColor: "#f0f0f0", borderRadius: "8px"}}>
-        <h2>이름: {name}</h2>
-        <input 
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="이름을 입력하세요"
-          style={{padding: "10px", fontSize: "16px", width: "100%"}}
-        />
-      </div>
-
-      {/* 설명 */}
-      <div style={{padding: "15px", backgroundColor: "#fff3cd", borderRadius: "8px"}}>
+      <div style={{
+        marginTop: "30px",
+        padding: "20px",
+        backgroundColor: "#fff3cd",
+        borderRadius: "8px"
+      }}>
         <h3>📝 F12로 콘솔 확인!</h3>
-        <ul style={{textAlign: "left"}}>
-          <li>🔴 매번 실행: 버튼/입력 모두 반응</li>
-          <li>🟢 한 번만: 새로고침할 때만</li>
-          <li>🔵 count만: 버튼 클릭할 때만</li>
-          <li>🟡 name만: 입력할 때만</li>
-        </ul>
+        <p>시작/정지할 때마다 로그를 확인해보세요!</p>
       </div>
     </div>
   );

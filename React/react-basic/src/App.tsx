@@ -1,372 +1,209 @@
-import React, { useRef } from "react";
+import { useRef, useState } from "react";
 
 function App() {
-  // DOM 요소에 접근하기 위한 ref
-  const inputRef = useRef<HTMLInputElement>(null);
-  const section1Ref = useRef<HTMLDivElement>(null);
-  const section2Ref = useRef<HTMLDivElement>(null);
-  const section3Ref = useRef<HTMLDivElement>(null);
+  const [seconds, setSeconds] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
 
-  // input에 포커스 주기
-  const focusInput = () => {
-    inputRef.current?.focus();
+  // useRef로 타이머 ID 저장
+  const timerRef = useRef<number | null>(null);
+
+  // 시작
+  const start = () => {
+    if(isRunning) return; // 이미 실행 중이면 무시
+
+    setIsRunning(true);
+
+    // timerRef.current에 타이머 ID 저장
+    timerRef.current = setInterval(() => {
+      setSeconds(prev => prev + 1);
+    }, 1000);
+
+    console.log("타이머 시작! ID:", timerRef.current);
   };
 
-  // 섹션으로 스크롤
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
-    ref.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+  // 정지
+  const stop = () => {
+    if(!isRunning) return;
+
+    setIsRunning(false);
+
+    // timerRef.current의 타이머 멈추기
+    if(timerRef.current){
+      clearInterval(timerRef.current);
+      console.log("타이머 정지 ID:", timerRef.current);
+      timerRef.current = null;
+    }
   };
 
-  // 맨 위로 스크롤
-  const scrollToTop = () => {
-    window.scroll({top: 0, behavior: 'smooth'});
+  // 리셋
+  const reset = () => {
+    stop();
+    setSeconds(0);
   };
-
+  
   return (
-    <div style={{fontFamily: "Arial"}}>
-      {/* 고정 헤더 */}
+    <div style={{
+      padding: "40px",
+      fontFamily: "Arial",
+      textAlign: "center",
+      minHeight: "100vh",
+      backgroundColor: "#f5f5f5"
+    }}>
+      <h1>⏱️ 스톱워치 (useRef)</h1>
+
+      {/* 시간 표시 */}
       <div style={{
-        position: "sticky",
-        top: 0,
-        padding: "20px",
-        backgroundColor: "#2196F3",
-        color: "white",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        zIndex: "100"
+        fontSize: "120px",
+        fontWeight: "bold",
+        margin: "60px 0",
+        color: isRunning ? "#4CAF50" : "#999",
+        fontFamily: "monospace"
       }}>
-        <h1>🎯 useRef - Dom 조작</h1>
+        {String(Math.floor(seconds / 60)).padStart(2, '0')}:
+        {String(seconds % 60).padStart(2, '0')}
+      </div>
 
-        {/* 네비게이션 버튼들 */}
-        <div style={{display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px"}}>
+      {/* 버튼들 */}
+      <div style={{display: "flex", gap: "15px", justifyContent: "center"}}>
+        {!isRunning ? (
           <button
-            onClick={() => scrollToSection(section1Ref)}
+            onClick={start}
             style={{
-              padding: "10px 20px",
-              backgroundColor: "white",
-              color: "#2196F3",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontWeight: "bold"
-            }}
-          >
-            📝 Section 1
-          </button>
-
-          <button
-            onClick={() => scrollToSection(section2Ref)}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "white",
-              color: "#2196F3",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontWeight: "bold"
-            }}
-          >
-            🎨 Section 2
-          </button>
-          
-          <button
-            onClick={() => scrollToSection(section3Ref)}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "white",
-              color: "#2196F3",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontWeight: "bold"
-            }}
-          >
-            🚀 Section 3
-          </button>
-
-          <button
-            onClick={scrollToTop}
-            style={{
-              padding: "10px 20px",
+              padding: "20px 40px",
+              fontSize: "24px",
               backgroundColor: "#4CAF50",
               color: "white",
               border: "none",
-              borderRadius: "5px",
+              borderRadius: "10px",
               cursor: "pointer",
               fontWeight: "bold"
             }}
           >
-            ⬆️ 맨 위로
+            ▶️ 시작
           </button>
-        </div>
-      </div>
-
-      {/* Section 1: Input 포커스 */}
-      <div
-        ref={section1Ref}
-        style={{
-          minHeight: "100vh",
-          padding: "40px",
-          backgroundColor: "#f0f0f0"
-        }}
-      >
-        <h2>📝 Section 1: Input 포커스</h2>
-
-        <div style={{
-          maxWidth: "800px",
-          margin: "20px auto",
-          padding: "30px",
-          backgroundColor: "white",
-          borderRadius: "10px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-        }}>
-          <h3>실무 예제: 검색창 자동 포커스</h3>
-
-          <input 
-            ref={inputRef}
-            type="text"
-            placeholder="여기에 입력하세요"
-            style={{
-              width: "100%",
-              padding: "15px",
-              boxSizing: "border-box",
-              fontSize: "18px",
-              border: "2px solid #ddd",
-              borderRadius: "8px",
-              marginBottom: "15px"
-            }}
-          />
-
+        ) : (
           <button
-            onClick={focusInput}
+            onClick={stop}
             style={{
-              padding: "12px 24px",
-              fontSize: "16px",
-              backgroundColor: "#2196F3",
+              padding: "20px 40px",
+              fontSize: "24px",
+              backgroundColor: "#f44336",
               color: "white",
               border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontWeight: "bold"
             }}
           >
-            🎯 포커스 주기
+            ⏸️ 정지
           </button>
+        )}
 
-          <div style={{
-            marginTop: "20px",
-            padding: "15px",
-            backgroundColor: "#fff3cd",
-            borderRadius: "5px"
-          }}>
-            <p><strong>💡 실무 활용</strong></p>
-            <ul style={{textAlign: "left"}}>
-              <li>검색 페이지 → 검색창 자동 포커스</li>
-              <li>로그인 페이지 → ID 입력창 포커스</li>
-              <li>모달 열릴 때 → 첫 input 포커스</li>
-              <li>에러 발생 시 → 해당 input 포커스</li>
-            </ul>
-          </div>
-        </div>
+        <button
+          onClick={reset}
+          style={{
+            padding: "20px 40px",
+            fontSize: "24px",
+            backgroundColor: "#2196F3",
+            color: "white",
+            border: "none",
+            borderRadius: "10px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
+          🔄 리셋
+        </button>
       </div>
 
-      {/* Section 2: 스크롤 제어 */}
-      <div
-        ref={section2Ref}
-        style={{
-          minHeight: "100vh",
-          padding: "40px",
-          backgroundColor: "#e8f5e9"
-        }}
-      >
-        <h2>🎨 Section 2: 스크롤 제어</h2>
+      {/* 설명 */}
+      <div style={{
+        marginTop: "60px",
+        maxWidth: "800px",
+        margin: "60px auto 0",
+        padding: "30px",
+        backgroundColor: "white",
+        borderRadius: "10px",
+        textAlign: "left",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+      }}>
+        <h2>🎯 핵심 포인트!</h2>
 
         <div style={{
-          maxWidth: "800px",
-          margin: "20px auto",
-          padding: "30px",
-          backgroundColor: "white",
-          borderRadius: "10px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+          padding: "20px",
+          backgroundColor: "#e8f5e9",
+          borderRadius: "8px",
+          marginBottom: "20px"
         }}>
-          <h3>실무 예제: 부드러운 스크롤</h3>
-
-          <p style={{fontSize: "18px", lineHeight: "1.8"}}>
-            위 헤더의 버튼들을 클릭하면<br />
-            부드럽게 해당 섹션으로 이동합니다!
-          </p>
-          <div style={{
-            marginTop: "20px",
+          <h3>1️⃣ useRef로 타이머 ID 저장</h3>
+          <pre style={{
+            backgroundColor: "#263238",
+            color: "#aed581",
             padding: "15px",
-            backgroundColor: "#e3f2fd",
-            borderRadius: "5px"
-          }}>
-            <p><strong>💡 실무 활용</strong></p>
-            <ul style={{textAlign: "left"}}>
-              <li>네비게이션 메뉴 → 섹션 이동</li>
-              <li>FAQ 페이지 → 질문 클릭 시 해당 답변으로</li>
-              <li>채팅 앱 → 새 메세지 도착 시 맨 아래로</li>
-              <li>"맨 위로" 버튼</li>
-            </ul>
-          </div>
-
-          <div style={{
-            marginTop: "30px",
-            padding: "20px",
-            backgroundColor: "#f5f5f5",
-            borderRadius: "8px",
-            fontFamily: "monospace",
+            borderRadius: "5px",
+            overflow: "auto",
             fontSize: "14px"
           }}>
-            <p><strong>핵심 코드</strong></p>
-            <pre style={{margin: "10px 0", overflow: "auto"}}>
-{`// ref 생성
-const sectionRef = useRef<HTMLDivElement>(null);
+{`const timerRef = useRef<number | null<(null);
 
-// 스크롤 함수
-const scrollToSection = () => {
-  sectionRef.current?.scrollIntoView({ 
-    behavior: 'smooth' 
-  });
-};
-
-// JSX에 연결
-<div ref={sectionRef}>내용</div>`}
-            </pre>
-          </div>
+// 시작
+timerRef.current = setInterval(() => {
+  setSeconds(prev => prev + 1);
+}, 1000);`}
+          </pre>
         </div>
-      </div>
-
-      {/* Section 3: 실전 패턴 */}
-      <div
-        ref={section3Ref}
-        style={{
-          minHeight: "100vh",
-          padding: "40px",
-          backgroundColor: "#fff3e0"
-        }}
-      >
-        <h2>🚀 Section 3: 실전 패턴</h2>
 
         <div style={{
-          padding: "30px",
-          backgroundColor: "white",
-          borderRadius: "10px",
-          marginTop: "20px"
+          padding: "20px",
+          backgroundColor: "#ffebee",
+          borderRadius: "8px",
+          marginBottom: "20px"
         }}>
-          <h3>자주 쓰는 DOM 조작 패턴</h3>
-
-          {/* 패턴 1 */}
-          <div style={{
-            marginBottom: "20px",
+          <h3>2️⃣ 직접 타이머 정지</h3>
+          <pre style={{
+            backgroundColor: "#263238",
+            color: "#ef5350",
             padding: "15px",
-            backgroundColor: "#e8f5e9",
-            borderRadius: "5px"
+            borderRadius: "5px",
+            overflow: "auto",
+            fontSize: "14px"
           }}>
-            <h4>1️⃣ 조건부 포커스</h4>
-            <pre style={{
-              backgroundColor: "#263238",
-              color: "#aed581",
-              padding: "15px",
-              borderRadius: "5px",
-              overflow: "auto"
-            }}>
-{`// 에러 발생 시 해당 input에 포커스
-if (error) {
-inputRef.current?.focus();
+{`// 정지
+if (timerRef.current) {
+  clearInterval(timerRef.current);
+  timerRef.current = null;
 }`}
-            </pre>
-          </div>
-
-          {/* 패턴 2 */}
-          <div style={{
-            marginBottom: "20px",
-            padding: "15px",
-            backgroundColor: "#e3f2fd",
-            borderRadius: "5px"
-          }}>
-            <h4>2️⃣ 요소 크기 가져오기</h4>
-            <pre style={{
-              backgroundColor: "#263238",
-              color: "#81d4fa",
-              padding: "15px",
-              borderRadius: "5px",
-              overflow: "auto"
-            }}>
-{`const width = divRef.current?.offsetWidth;
-const height = divRef.current?.offsetHeight;
-console.log(width, height);`}
-            </pre>
-          </div>
-
-          {/* 패턴 3 */}
-          <div style={{
-            marginBottom: "20px",
-            padding: "15px",
-            backgroundColor: "#fff3e0",
-            borderRadius: "5px"
-          }}>
-            <h4>3️⃣ 클래스 추가/제거</h4>
-            <pre style={{
-              backgroundColor: "#263238",
-              color: "#ffb74d",
-              padding: "15px",
-              borderRadius: "5px",
-              overflow: "auto"
-            }}>
-{`divRef.current?.classList.add('active');
-divRef.current?.classList.remove('active');
-divRef.current?.classList.toggle('active');`}
-            </pre>
-          </div>
-
-          {/* 패턴 4 */}
-          <div style={{
-            marginBottom: "20px",
-            padding: "15px",
-            backgroundColor: "#f3e5f5",
-            borderRadius: "5px"
-          }}>
-            <h4>4️⃣ 스크롤 위치 확인</h4>
-            <pre style={{
-              backgroundColor: "#263238",
-              color: "#ce93d8",
-              padding: "15px",
-              borderRadius: "5px",
-              overflow: "auto"
-            }}>
-{`const scrollTop = divRef.current?.scrollTop;
-const scrollLeft = divRef.current?.scrollLeft;`}
-            </pre>
-          </div>
+          </pre>
+        </div>
+        
+        <div style={{
+          padding: "20px",
+          backgroundColor: "#fff3e0",
+          borderRadius: "8px"
+        }}>
+          <h3>💡 왜 useRef를 쓰는가!?</h3>
+          <ul>
+            <li><strong>useState 쓰면?</strong> → 타이머 ID 바뀔 때마다 리렌더링 (불필요!)</li>
+            <li><strong>useRef 쓰면?</strong> → 리렌더링 없이 값만 저장! (효율적!)</li>
+            <li><strong>결론:</strong>화면에 안 보이는 값은 useRef!</li>
+          </ul>
         </div>
       </div>
 
-      {/* 맨 위로 버튼 (고정) */}
-      <button
-        onClick={scrollToTop}
-        style={{
-          position: "fixed",
-          bottom: "30px",
-          right: "30px",
-          width: "60px",
-          height: "60px",
-          borderRadius: "50%",
-          backgroundColor: "#2196F3",
-          color: "white",
-          border: "none",
-          fontSize: "24px",
-          cursor: "pointer",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        ⬆️
-      </button>
+      {/* F12 콘솔 확인 */}
+      <div style={{
+        marginTop: "30px",
+        padding: "20px",
+        backgroundColor: "#e3f2fd",
+        borderRadius: "8px",
+        maxWidth: "800px",
+        margin: "30px auto 0"
+      }}>
+        <p style={{margin: 0, fontSize: "18px"}}>
+          📝 <strong>F12</strong> 눌러서 Console 탭 확인!<br />
+          타이머 ID가 출력돼요!
+        </p>
+      </div>
     </div>
   );
 }

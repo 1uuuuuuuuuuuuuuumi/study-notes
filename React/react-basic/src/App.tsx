@@ -124,7 +124,85 @@ function CounterStats(){
 
 function App() {
   return (
-    <></>
+    <div style={{
+      padding: "40px",
+      fontFamily: "Arial",
+      minHeight: "100vh",
+      backgroundColor: "#f5f5f5"
+    }}>
+      <h1 style={{textAlign: "center"}}>🚀 zustand - 전역 상태 공유</h1>
+
+      <div style={{
+        maxWidth: "800px",
+        margin: "40px auto"
+      }}>
+        {/* 3개의 독립된 컴포넌트! */}
+        <CounterDisplay />
+        <CounterButtons />
+        <CounterStats />
+
+        {/* 설명 */}
+        <div style={{
+          padding: "30px",
+          backgroundColor: "white",
+          borderRadius: "10px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+        }}>
+          <h2>✨ 정 리 ✨</h2>
+          
+          <div style={{
+            padding: "20px",
+            backgroundColor: "#f3e5f5",
+            borderRadius: "8px",
+            marginBottom: "20px"
+          }}>
+            <h3>🎯 핵심 포인트</h3>
+            <ul style={{lineHeight: "1.8"}}>
+              <li><strong>3개의 독립된 컴포넌트</strong></li>
+              <li><strong>Props 전달 없음!</strong></li>
+              <li><strong>모두 같은 count 공유</strong></li>
+              <li><strong>버튼 클릭 → 모든 곳에서 업데이트!</strong></li>
+            </ul>
+          </div>
+
+          <div style={{
+            padding: "20px",
+            backgroundColor: "#e8f5e9",
+            borderRadius: "8px"
+          }}>
+            <h3>💡 useState였다면?</h3>
+            <pre style={{
+              backgroundColor: "#263238",
+              color: "#aed581",
+              padding: "15px",
+              borderRadius: "5px",
+              overflow: "auto",
+              fontSize: "14px"
+            }}>
+{`// (X) Props 지옥!
+function App() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <>
+      <CounterDisplay count={count} />
+      <CounterButtons
+        count={count}
+        setCount={setCount}
+      />
+      <CounterStats count={count} />
+    </>
+  );
+}`}
+            </pre>
+
+            <p style={{marginTop: "15px", color: "#2e7d32", fontWeight: "bold"}}>
+              ✅ zustand는 Props 불필요!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

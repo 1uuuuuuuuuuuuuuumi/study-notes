@@ -1,35 +1,171 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Movie {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path: string | null;
+  vote_average: number;
+  release_date: string;
 }
 
-export default App
+
+function App() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPopularMovies();
+  }, []);
+
+  const fetchPopularMovies = async () => {
+    try {
+      setLoading(true);
+      const apikey = import.meta.env.VITE_TMDB_API_KEY;
+      const response = await fetch(
+        `https://api.themoviedb.org/3/movie/popular?api_key=${apikey}&language=ko-KR&page=1`
+      );
+      const data = await response.json();
+      setMovies(data.results);
+      console.log('영화 데이터:', data.results);
+    } catch (error) {
+      console.error('영화 불러오기 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if(loading){
+    return (
+      <div style={{
+        padding: "40px",
+        textAlign: "center",
+        backgroundColor: "#1a1a1a",
+        minHeight: "100vh",
+        color: "white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        <div>
+          <div style={{fontSize: "64px", marginBottom: "20px"}}>🎬</div>
+          <h1>로딩 중...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      padding: "40px",
+      fontFamily: "Arial",
+      backgroundColor: "#1a1a1a",
+      minHeight: "100vh",
+      color: "white"
+    }}>
+      <div style={{
+        textAlign: "center",
+        marginBottom: "40px"
+      }}>
+        <h1 style={{fontSize: "48px", margin: "0 0 10px 0"}}>
+          🎬 Movie Finder
+        </h1>
+        <p style={{color: '#999', fontSize: "18px"}}>
+          TMDB 인기 영화 TOP 20
+        </p>
+      </div>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gap: '30px',
+        maxWidth: '1400px',
+        margin: '0 auto'
+      }}>
+        {movies.map(movie => (
+          <div
+            key={movie.id}
+            style={{
+              backgroundColor: "#2a2a2a",
+              borderRadius: "15px",
+              overflow: "hidden",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.3)"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-10px)';
+              e.currentTarget.style.boxShadow = '0 8px 12px rgba(0,0,0,0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'transLateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
+            }}
+          >
+            {movie.poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+                style={{
+                  width: '100%',
+                  height: '300px',
+                  objectFit: 'cover'
+                }}
+              />
+            ) : (
+              <div style={{
+                width: '100%',
+                height: '300px',
+                backgroundClip: '#444',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '64px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%'
+              }}>
+                🎬
+              </div>
+            )}
+
+            <div style={{padding: '15px'}}>
+              <h3 style={{
+                fontSize: '16px',
+                margin: '0 0 8px 0',
+                fontWeight: 'bold',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {movie.title}
+              </h3>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingTop: '10px',
+                borderTop: '1px solid #444'
+              }}>
+                <span style={{
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  color: '#ffd700'
+                }}>
+                  ⭐ {movie.vote_average.toFixed(1)}
+                </span>
+                <span style={{
+                  fontSize: '14px',
+                  color: '#999'
+                }}>
+                  {movie.release_date?.split('-')[0]}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;

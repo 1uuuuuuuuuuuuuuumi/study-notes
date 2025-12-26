@@ -111,6 +111,74 @@ function App() {
         <p style={{color: '#999', fontSize: "18px"}}>
           {isSearchMode ? `"${searchTerm}" 검색 결과` : 'TMDB 인기 영화 TOP 20'}
         </p>
+
+        {/* 검색창 추가 */}
+        <div style={{
+          maxWidth: '600px',
+          margin: '30px auto 0',
+          display: 'flex',
+          gap: '10px'
+        }}>
+          <input
+            ref={inputRef}
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="영화 제목을 입력하세요 (예: 아바타, 어벤져스)"
+            style={{
+              flex: 1,
+              padding: '15px 20px',
+              fontSize: '16px',
+              border: '2px solid #444',
+              borderRadius: '10px',
+              backgroundColor: '#2a2a2a',
+              color: 'white',
+              outline: 'none'
+            }}
+          />
+          <button
+            onClick={handleSearch}
+            style={{
+              padding: '15px 30px',
+              fontSize: '16px',
+              backgroundColor: '#667eea',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'all 0.3s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5568d3'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#667eea'}
+          >
+            🔍 검색
+          </button>
+          {isSearchMode && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setIsSearchMode(false);
+                fetchPopularMovies();
+                inputRef.current?.focus();
+              }}
+              style={{
+                padding: '15px 30px',
+                fontSize: '16px',
+                backgroundColor: '#f44336',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              X 초기화
+            </button>
+          )}
+        </div>
+
       </div>
 
       <div style={{

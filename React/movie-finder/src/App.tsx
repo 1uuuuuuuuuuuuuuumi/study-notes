@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface Movie {
   id: number;
@@ -13,6 +13,10 @@ interface Movie {
 function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPopularMovies();
@@ -32,6 +36,40 @@ function App() {
       console.error('영화 불러오기 실패:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const searchMovies = async (query: string) => {
+    if(query.trim() === ''){
+      fetchPopularMovies();
+      setIsSearchMode(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setIsSearchMode(true);
+      const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+      const response = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=ko-KR&query=${query}&page=1`
+      );
+      const data = await response.json();
+      setMovies(data.results);
+      console.log('검색 결과:', data.results);
+    } catch (error) {
+      console.log('검색 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    searchMovies(searchTerm);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if(e.key === 'Enter' && !e.nativeEvent.isComposing){
+      handleSearch();
     }
   };
 

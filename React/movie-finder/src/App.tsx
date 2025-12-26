@@ -109,7 +109,7 @@ function App() {
           🎬 Movie Finder
         </h1>
         <p style={{color: '#999', fontSize: "18px"}}>
-          TMDB 인기 영화 TOP 20
+          {isSearchMode ? `"${searchTerm}" 검색 결과` : 'TMDB 인기 영화 TOP 20'}
         </p>
       </div>
 

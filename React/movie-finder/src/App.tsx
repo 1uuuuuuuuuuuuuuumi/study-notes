@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import useFavoriteStore from "./store/favoriteStore";
 
 interface Movie {
   id: number;
@@ -16,6 +17,12 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // zustand store
+  const favorites = useFavoriteStore(state => state.favorites);
+  const addFavorite = useFavoriteStore(state => state.addFavorite);
+  const removeFavorite = useFavoriteStore(state => state.removeFavorite);
+  const isFavorite = useFavoriteStore(state => state.isFavorite);
 
   useEffect(() => {
     fetchPopularMovies();
@@ -307,6 +314,39 @@ function App() {
                   {movie.release_date?.split("-")[0]}
                 </span>
               </div>
+
+              {/* 즐겨찾기 버튼 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if(isFavorite(movie.id)){
+                    removeFavorite(movie.id);
+                  } else {
+                    addFavorite(movie);
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  marginTop: '10px',
+                  padding: '10px',
+                  fontSize: '14px',
+                  backgroundColor: isFavorite(movie.id) ? '#f44336' : '#667eea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '0.8';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                }}
+              >
+                {isFavorite(movie.id) ? '💔 즐겨찾기 해제' : '💖 즐겨찾기'}
+              </button>
             </div>
           </div>
         ))}

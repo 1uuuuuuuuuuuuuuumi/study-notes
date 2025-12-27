@@ -117,7 +117,7 @@ function App() {
           {isSearchMode ? `"${searchTerm}" 검색 결과` : "TMDB 인기 영화 TOP 20"}
         </p>
 
-        {/* 검색창 추가 */}
+        {/* 검색창 */}
         <div
           style={{
             maxWidth: "600px",
@@ -206,7 +206,9 @@ function App() {
         </div>
       )}
 
-      <div
+      {/* 영화 목록 */}
+      {!loading && movies.length > 0 && (
+        <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
@@ -231,10 +233,11 @@ function App() {
               e.currentTarget.style.boxShadow = "0 8px 12px rgba(0,0,0,0.4)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "transLateY(0)";
+              e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.3)";
             }}
           >
+            {/* 포스터 */}
             {movie.poster_path ? (
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -250,13 +253,13 @@ function App() {
                 style={{
                   width: "100%",
                   height: "300px",
-                  backgroundClip: "#444",
+                  backgroundColor: "#444",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: "64px",
                   background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%",
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 }}
               >
                 🎬
@@ -308,6 +311,9 @@ function App() {
           </div>
         ))}
       </div>
+      )}
+      
+      
     </div>
   );
 }

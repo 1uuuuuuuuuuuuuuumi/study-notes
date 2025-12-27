@@ -9,12 +9,11 @@ interface Movie {
   release_date: string;
 }
 
-
 function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -31,16 +30,16 @@ function App() {
       );
       const data = await response.json();
       setMovies(data.results);
-      console.log('영화 데이터:', data.results);
+      console.log("영화 데이터:", data.results);
     } catch (error) {
-      console.error('영화 불러오기 실패:', error);
+      console.error("영화 불러오기 실패:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const searchMovies = async (query: string) => {
-    if(query.trim() === ''){
+    if (query.trim() === "") {
       fetchPopularMovies();
       setIsSearchMode(false);
       return;
@@ -55,9 +54,9 @@ function App() {
       );
       const data = await response.json();
       setMovies(data.results);
-      console.log('검색 결과:', data.results);
+      console.log("검색 결과:", data.results);
     } catch (error) {
-      console.log('검색 실패:', error);
+      console.log("검색 실패:", error);
     } finally {
       setLoading(false);
     }
@@ -68,25 +67,27 @@ function App() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if(e.key === 'Enter' && !e.nativeEvent.isComposing){
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       handleSearch();
     }
   };
 
-  if(loading){
+  if (loading) {
     return (
-      <div style={{
-        padding: "40px",
-        textAlign: "center",
-        backgroundColor: "#1a1a1a",
-        minHeight: "100vh",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}>
+      <div
+        style={{
+          padding: "40px",
+          textAlign: "center",
+          backgroundColor: "#1a1a1a",
+          minHeight: "100vh",
+          color: "white",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <div>
-          <div style={{fontSize: "64px", marginBottom: "20px"}}>🎬</div>
+          <div style={{ fontSize: "64px", marginBottom: "20px" }}>🎬</div>
           <h1>로딩 중...</h1>
         </div>
       </div>
@@ -94,31 +95,37 @@ function App() {
   }
 
   return (
-    <div style={{
-      padding: "40px",
-      fontFamily: "Arial",
-      backgroundColor: "#1a1a1a",
-      minHeight: "100vh",
-      color: "white"
-    }}>
-      <div style={{
-        textAlign: "center",
-        marginBottom: "40px"
-      }}>
-        <h1 style={{fontSize: "48px", margin: "0 0 10px 0"}}>
+    <div
+      style={{
+        padding: "40px",
+        fontFamily: "Arial",
+        backgroundColor: "#1a1a1a",
+        minHeight: "100vh",
+        color: "white",
+      }}
+    >
+      <div
+        style={{
+          textAlign: "center",
+          marginBottom: "40px",
+        }}
+      >
+        <h1 style={{ fontSize: "48px", margin: "0 0 10px 0" }}>
           🎬 Movie Finder
         </h1>
-        <p style={{color: '#999', fontSize: "18px"}}>
-          {isSearchMode ? `"${searchTerm}" 검색 결과` : 'TMDB 인기 영화 TOP 20'}
+        <p style={{ color: "#999", fontSize: "18px" }}>
+          {isSearchMode ? `"${searchTerm}" 검색 결과` : "TMDB 인기 영화 TOP 20"}
         </p>
 
         {/* 검색창 추가 */}
-        <div style={{
-          maxWidth: '600px',
-          margin: '30px auto 0',
-          display: 'flex',
-          gap: '10px'
-        }}>
+        <div
+          style={{
+            maxWidth: "600px",
+            margin: "30px auto 0",
+            display: "flex",
+            gap: "10px",
+          }}
+        >
           <input
             ref={inputRef}
             type="text"
@@ -128,67 +135,87 @@ function App() {
             placeholder="영화 제목을 입력하세요 (예: 아바타, 어벤져스)"
             style={{
               flex: 1,
-              padding: '15px 20px',
-              fontSize: '16px',
-              border: '2px solid #444',
-              borderRadius: '10px',
-              backgroundColor: '#2a2a2a',
-              color: 'white',
-              outline: 'none'
+              padding: "15px 20px",
+              fontSize: "16px",
+              border: "2px solid #444",
+              borderRadius: "10px",
+              backgroundColor: "#2a2a2a",
+              color: "white",
+              outline: "none",
             }}
           />
           <button
             onClick={handleSearch}
             style={{
-              padding: '15px 30px',
-              fontSize: '16px',
-              backgroundColor: '#667eea',
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              transition: 'all 0.3s'
+              padding: "15px 30px",
+              fontSize: "16px",
+              backgroundColor: "#667eea",
+              color: "white",
+              border: "none",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              transition: "all 0.3s",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5568d3'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#667eea'}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#5568d3")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#667eea")
+            }
           >
             🔍 검색
           </button>
           {isSearchMode && (
             <button
               onClick={() => {
-                setSearchTerm('');
+                setSearchTerm("");
                 setIsSearchMode(false);
                 fetchPopularMovies();
                 inputRef.current?.focus();
               }}
               style={{
-                padding: '15px 30px',
-                fontSize: '16px',
-                backgroundColor: '#f44336',
-                color: 'white',
-                border: 'none',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
+                padding: "15px 30px",
+                fontSize: "16px",
+                backgroundColor: "#f44336",
+                color: "white",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontWeight: "bold",
               }}
             >
               X 초기화
             </button>
           )}
         </div>
-
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-        gap: '30px',
-        maxWidth: '1400px',
-        margin: '0 auto'
-      }}>
-        {movies.map(movie => (
+      {/* 검색 결과 없을 때 */}
+      {!loading && movies.length === 0 && (
+        <div style={{
+          textAlign: 'center',
+          padding: '10px 40px',
+          color: "#999"
+        }}>
+          <div style={{fontSize: '64px', marginBottom: '20px'}}>🔍</div>
+          <h2 style={{fontSize: '24px', marginBottom: '10px'}}>검색 결과가 없습니다</h2>
+          <p style={{fontSize: '16px'}}>
+            다른 검색어를 입력해보세요
+          </p>
+        </div>
+      )}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: "30px",
+          maxWidth: "1400px",
+          margin: "0 auto",
+        }}
+      >
+        {movies.map((movie) => (
           <div
             key={movie.id}
             style={{
@@ -197,15 +224,15 @@ function App() {
               overflow: "hidden",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.3)"
+              boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-10px)';
-              e.currentTarget.style.boxShadow = '0 8px 12px rgba(0,0,0,0.4)';
+              e.currentTarget.style.transform = "translateY(-10px)";
+              e.currentTarget.style.boxShadow = "0 8px 12px rgba(0,0,0,0.4)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'transLateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
+              e.currentTarget.style.transform = "transLateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.3)";
             }}
           >
             {movie.poster_path ? (
@@ -213,57 +240,68 @@ function App() {
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                 alt={movie.title}
                 style={{
-                  width: '100%',
-                  height: '300px',
-                  objectFit: 'cover'
+                  width: "100%",
+                  height: "300px",
+                  objectFit: "cover",
                 }}
               />
             ) : (
-              <div style={{
-                width: '100%',
-                height: '300px',
-                backgroundClip: '#444',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '64px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%'
-              }}>
+              <div
+                style={{
+                  width: "100%",
+                  height: "300px",
+                  backgroundClip: "#444",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "64px",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%",
+                }}
+              >
                 🎬
               </div>
             )}
 
-            <div style={{padding: '15px'}}>
-              <h3 style={{
-                fontSize: '16px',
-                margin: '0 0 8px 0',
-                fontWeight: 'bold',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
-              }}>
+            <div style={{ padding: "15px" }}>
+              <h3
+                style={{
+                  fontSize: "16px",
+                  margin: "0 0 8px 0",
+                  fontWeight: "bold",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {movie.title}
               </h3>
 
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingTop: '10px',
-                borderTop: '1px solid #444'
-              }}>
-                <span style={{
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  color: '#ffd700'
-                }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingTop: "10px",
+                  borderTop: "1px solid #444",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    color: "#ffd700",
+                  }}
+                >
                   ⭐ {movie.vote_average.toFixed(1)}
                 </span>
-                <span style={{
-                  fontSize: '14px',
-                  color: '#999'
-                }}>
-                  {movie.release_date?.split('-')[0]}
+                <span
+                  style={{
+                    fontSize: "14px",
+                    color: "#999",
+                  }}
+                >
+                  {movie.release_date?.split("-")[0]}
                 </span>
               </div>
             </div>

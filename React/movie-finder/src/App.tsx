@@ -24,6 +24,8 @@ function App() {
   const removeFavorite = useFavoriteStore(state => state.removeFavorite);
   const isFavorite = useFavoriteStore(state => state.isFavorite);
 
+  const [activeTab, setActiveTab] = useState<'popular' | 'search' | 'favorites'>('popular');
+
   useEffect(() => {
     fetchPopularMovies();
   }, []);
@@ -121,7 +123,11 @@ function App() {
           🎬 Movie Finder
         </h1>
         <p style={{ color: "#999", fontSize: "18px" }}>
-          {isSearchMode ? `"${searchTerm}" 검색 결과` : "TMDB 인기 영화 TOP 20"}
+          {activeTab === 'favorites'
+            ? '내가 좋아하는 영화들'
+            : isSearchMode
+              ? `"${searchTerm}" 검색 결과`
+              : 'TMDB 인기 영화 TOP 20'}
         </p>
 
         {/* 검색창 */}
@@ -195,6 +201,53 @@ function App() {
               X 초기화
             </button>
           )}
+        </div>
+
+        {/* 탭 버튼 */}
+        <div style={{
+          display: 'flex',
+          gap: '10px',
+          justifyContent: 'center',
+          marginTop: '30px'
+        }}>
+          <button
+            onClick={() => {
+              setActiveTab('popular');
+              setIsSearchMode(false);
+              setSearchTerm('');
+              fetchPopularMovies();
+            }}
+            style={{
+              padding: '12px 24px',
+              fontSize: '16px',
+              backgroundColor: activeTab === 'popular' ? '#667eea' : '#444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'all 0.3s'
+            }}
+          >
+            🔥 인기 영화
+          </button>
+
+          <button
+            onClick={() => setActiveTab('favorites')}
+            style={{
+              padding: '12px 24px',
+              fontSize: '16px',
+              backgroundColor: activeTab === 'favorites' ? '#667eea' : '#444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'all 0.3s'
+            }}
+          >
+            💖 즐겨찾기 ({favorites.length})
+          </button>
         </div>
       </div>
 

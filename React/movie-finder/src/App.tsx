@@ -26,6 +26,21 @@ function App() {
 
   const [activeTab, setActiveTab] = useState<'popular' | 'search' | 'favorites'>('popular');
 
+  // 모달
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null); // 클릭한 영화 정보
+  const [isModalOpen, setIsModalOpen] = useState(false);  // 모달 열림/닫힘 상태
+
+  // 모달 열기 함수
+  const openModal = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedMovie(null);
+  };
+
   useEffect(() => {
     fetchPopularMovies();
   }, []);
@@ -288,6 +303,7 @@ function App() {
               transition: "all 0.3s ease",
               boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
             }}
+            onClick={() => openModal(movie)}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-10px)";
               e.currentTarget.style.boxShadow = "0 8px 12px rgba(0,0,0,0.4)";
@@ -442,6 +458,7 @@ function App() {
                     transition: 'all 0.3s ease',
                     boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
                   }}
+                  onClick={() => openModal(movie)}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-10px)';
                     e.currentTarget.style.boxShadow = '0 8px 12px rgba(0,0,0,0.4)';
@@ -536,6 +553,155 @@ function App() {
               ))}
             </div>
           )}
+        </div>
+      )}
+      
+      {/* 영화 상세 모달 */}
+      {isModalOpen && selectedMovie && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+          onClick={closeModal}
+        >
+          <div style={{
+            backgroundColor: '#2a2a2a',
+            borderRadius: '20px',
+            maxWidth: '800px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closeModal}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                border: 'none',
+                backgroundColor: '#f44336',
+                color: 'white',
+                fontSize: '20px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                zIndex: 10
+              }}
+            >
+              X
+            </button>
+
+            {/* 포스터와 정보 */}
+            <div style={{display: 'flex', gap: '30px', padding: '40px'}}>
+              {/* 포스터 */}
+              <div style={{flexShrink: 0}}>
+                {selectedMovie.poster_path ? (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
+                    alt={selectedMovie.title}
+                    style={{
+                      width: '300px',
+                      borderRadius: '10px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '300px',
+                    height: '450px',
+                    backgroundColor: '#444',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '80px'
+                  }}>
+                    🎬
+                  </div>
+                )}
+              </div>
+
+              {/* 정보 */}
+              <div style={{flex: 1, color: 'white'}}>
+                <h1 style={{
+                  fontSize: '32px',
+                  margin: '0 0 20px 0',
+                  paddingRight: '40px'
+                }}>
+                  {selectedMovie.title}
+                </h1>
+
+                <div style={{
+                  display: 'flex',
+                  gap: '20px',
+                  marginBottom: '20px',
+                  fontSize: '18px'
+                }}>
+                  <span style={{color: '#ffd700', fontWeight: 'bold'}}>
+                    ⭐ {selectedMovie.release_date}
+                  </span>
+                </div>
+
+                <div style={{marginBottom: '20px'}}>
+                  <h3 style={{
+                    fontSize: '20px',
+                    marginBottom: '10px',
+                    color: '#667eea'
+                  }}>
+                    줄거리
+                  </h3>
+                  <p style={{
+                    fontSize: '16px',
+                    lineHeight: '1.6',
+                    color: '#ddd'
+                  }}>
+                    {selectedMovie.overview || '줄거리 정보가 없습니다.'}
+                  </p>
+                </div>
+
+                {/* 즐겨찾기 버튼 */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if(isFavorite(selectedMovie.id)){
+                      removeFavorite(selectedMovie.id)
+                    } else {
+                      addFavorite(selectedMovie);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '15px',
+                    fontSize: '16px',
+                    backgroundColor: isFavorite(selectedMovie.id) ? '#f44336' : '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    marginTop: '20px'
+                  }}
+                >
+                  {isFavorite(selectedMovie.id) ? '💔 즐겨찾기 해제' : '💖 즐겨찾기'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

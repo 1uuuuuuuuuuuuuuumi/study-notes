@@ -252,7 +252,7 @@ function App() {
       </div>
 
       {/* 검색 결과 없을 때 */}
-      {!loading && movies.length === 0 && (
+      {activeTab !== 'favorites' && !loading && movies.length === 0 && (
         <div style={{
           textAlign: 'center',
           padding: '10px 40px',
@@ -266,8 +266,8 @@ function App() {
         </div>
       )}
 
-      {/* 영화 목록 */}
-      {!loading && movies.length > 0 && (
+      {/* 영화 목록 (인기/검색) */}
+      {activeTab !== 'favorites' && !loading && movies.length > 0 && (
         <div
         style={{
           display: "grid",
@@ -280,7 +280,7 @@ function App() {
         {movies.map((movie) => (
           <div
             key={movie.id}
-            style={{
+            style={{ /* 영화 카드 스타일 */
               backgroundColor: "#2a2a2a",
               borderRadius: "15px",
               overflow: "hidden",
@@ -368,7 +368,7 @@ function App() {
                 </span>
               </div>
 
-              {/* 즐겨찾기 버튼 */}
+              {/* 즐겨찾기 탭 */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -405,8 +405,139 @@ function App() {
         ))}
       </div>
       )}
-      
-      
+
+      {/* 즐겨찾기 탭 */}
+      {activeTab === 'favorites' && (
+        <div>
+          {favorites.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '100px 40px',
+              color: '#999'
+            }}>
+              <div style={{fontSize: '64px', marginBottom: '20px'}}>💖</div>
+              <h2 style={{fontSize: '24px', marginBottom: '10px'}}>
+                아직 즐겨찾기한 영화가 없어요
+              </h2>
+              <p style={{fontSize: '16px'}}>
+                마음에 드는 영화를 즐겨찾기에 추가해보세요!
+              </p>
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+              gap: '30px',
+              maxWidth: '1400px',
+              margin: '0 auto'
+            }}>
+              {favorites.map((movie) => (
+                <div
+                  key={movie.id}
+                  style={{
+                    backgroundColor: '#2a2a2a',
+                    borderRadius: '15px',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-10px)';
+                    e.currentTarget.style.boxShadow = '0 8px 12px rgba(0,0,0,0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
+                  }}
+                >
+                  {movie.poster_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                      alt={movie.title}
+                      style={{
+                        width: '100%',
+                        height: '300px',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '300px',
+                      backgroundColor: '#444',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '64px',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                    }}>
+                      🎬
+                    </div>
+                  )}
+
+                  <div style={{padding: '15px'}}>
+                    <h3 style={{
+                      fontSize: '16px',
+                      margin: '0 0 8px 0',
+                      fontWeight: 'bold',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {movie.title}
+                    </h3>
+
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingTop: '10px',
+                      borderTop: '1px solid #444'
+                    }}>
+                      <span style={{
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#ffd700'
+                      }}>
+                        ⭐ {movie.vote_average.toFixed(1)}
+                      </span>
+                      <span style={{
+                        fontSize: '14px',
+                        color: '#999'
+                      }}>
+                        {movie.release_date?.split('-')[0]}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFavorite(movie.id);
+                      }}
+                      style={{
+                        width: '100%',
+                        marginTop: '10px',
+                        padding: '10px',
+                        fontSize: '14px',
+                        backgroundColor: '#f44336',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        transition: 'all 0.3s'
+                      }}
+                    >
+                      💔 즐겨찾기 해제
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

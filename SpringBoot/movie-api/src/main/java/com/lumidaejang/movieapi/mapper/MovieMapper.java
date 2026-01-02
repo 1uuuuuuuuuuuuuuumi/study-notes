@@ -13,4 +13,6 @@ public interface MovieMapper {
 
     // ID로 영화 조회
     Movie findById(Long id);
+
+    void insert(Movie movie);
 }

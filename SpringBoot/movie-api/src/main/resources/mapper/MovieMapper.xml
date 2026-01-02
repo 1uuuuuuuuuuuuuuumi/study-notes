@@ -24,5 +24,10 @@
         FROM movie
         WHERE id = #{id}
     </select>
+
+    <insert id="insert" parameterType="com.lumidaejang.movieapi.entity.Movie" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO movie (title, overview)
+        VALUES (#{title}, #{overview})
+    </insert>
     
 </mapper>

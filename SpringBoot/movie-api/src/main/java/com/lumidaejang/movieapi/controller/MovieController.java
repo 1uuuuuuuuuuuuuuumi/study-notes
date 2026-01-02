@@ -2,10 +2,7 @@ package com.lumidaejang.movieapi.controller;
 
 import com.lumidaejang.movieapi.entity.Movie;
 import com.lumidaejang.movieapi.mapper.MovieMapper;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 

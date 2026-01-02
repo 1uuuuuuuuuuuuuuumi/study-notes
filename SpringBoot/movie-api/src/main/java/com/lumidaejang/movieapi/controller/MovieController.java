@@ -28,4 +28,11 @@ public class MovieController {
     public Movie getMovieById(@PathVariable Long id){
         return movieMapper.findById(id);
     }
+
+    // 등록
+    @PostMapping("/movies")
+    public Movie createMovie(@RequestBody Movie movie){
+        movieMapper.insert(movie);
+        return movie;   // ID가 자동으로 채워져서 반환됨
+    }
 }

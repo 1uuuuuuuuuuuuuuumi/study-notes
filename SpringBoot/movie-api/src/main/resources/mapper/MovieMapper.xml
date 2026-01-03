@@ -25,9 +25,18 @@
         WHERE id = #{id}
     </select>
 
+    <!-- 등록 -->
     <insert id="insert" parameterType="com.lumidaejang.movieapi.entity.Movie" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO movie (title, overview)
         VALUES (#{title}, #{overview})
     </insert>
+
+    <!-- 수정 -->
+    <update id="update" parameterType="com.lumidaejang.movieapi.entity.Movie">
+        UPDATE movie
+        SET title = #{title},
+                overview = #{overview}
+        WHERE id = #{id}
+    </update>
     
 </mapper>

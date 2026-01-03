@@ -35,4 +35,12 @@ public class MovieController {
         movieMapper.insert(movie);
         return movie;   // ID가 자동으로 채워져서 반환됨
     }
+
+// 수정
+    @PutMapping("/movies/{id}")
+    public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movie){
+        movie.setId((id));  // URL의 ID 설정
+        movieMapper.update(movie);
+        return movieMapper.findById(id);    // 수정된 영화 반환
+    }
 }

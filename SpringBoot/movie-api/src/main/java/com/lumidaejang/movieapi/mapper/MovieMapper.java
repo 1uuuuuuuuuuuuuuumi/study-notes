@@ -14,5 +14,9 @@ public interface MovieMapper {
     // ID로 영화 조회
     Movie findById(Long id);
 
+    // 등록
     void insert(Movie movie);
+
+    // 수정
+    void update(Movie movie);
 }

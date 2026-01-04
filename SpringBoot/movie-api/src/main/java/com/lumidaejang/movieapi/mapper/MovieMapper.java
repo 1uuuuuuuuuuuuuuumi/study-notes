@@ -19,4 +19,7 @@ public interface MovieMapper {
 
     // 수정
     void update(Movie movie);
+
+    // 삭제
+    void delete(Long id);
 }

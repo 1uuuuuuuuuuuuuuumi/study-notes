@@ -38,5 +38,11 @@
                 overview = #{overview}
         WHERE id = #{id}
     </update>
+
+    <!-- 삭제 -->
+    <delete id="delete" parameterType="Long">
+        DELETE FROM movie
+        WHERE id = #{id}
+    </delete>
     
 </mapper>

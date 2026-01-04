@@ -36,11 +36,17 @@ public class MovieController {
         return movie;   // ID가 자동으로 채워져서 반환됨
     }
 
-// 수정
+    // 수정
     @PutMapping("/movies/{id}")
     public Movie updateMovie(@PathVariable Long id, @RequestBody Movie movie){
         movie.setId((id));  // URL의 ID 설정
         movieMapper.update(movie);
         return movieMapper.findById(id);    // 수정된 영화 반환
+    }
+
+    // 삭제
+    @DeleteMapping("/movies/{id}")
+    public void deleteMovie(@PathVariable Long id){
+        movieMapper.delete(id);
     }
 }

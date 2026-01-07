@@ -36,6 +36,11 @@ function App() {
   const [newMovieOverview, setNewMovieOverview] = useState("");
   const [isAddingMovie, setIsAddingMovie] = useState(false);
 
+  // 수정용 state
+  const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editOverview, setEditOverview] = useState("");
+
   // 모달
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null); // 클릭한 영화 정보
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림/닫힘 상태
@@ -120,6 +125,52 @@ function App() {
       console.error("영화 추가 실패:", error);
       alert("영화 추가에 실패했습니다 😢");
     }
+  };
+
+  // 영화 수정 함수
+  const updateMovie = async (id: number) => {
+    if (!editTitle.trim()) {
+      alert("영화 제목을 입력해주세요!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/movies/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: editTitle,
+          overview: editOverview,
+        }),
+      });
+
+      if (response.ok) {
+        alert("영화가 수정되었습니다! ✏️");
+        setEditingMovie(null);
+        setEditTitle("");
+        setEditOverview("");
+        fetchMyMovies(); // 목록 새로고침
+      }
+    } catch (error) {
+      console.error("영화 수정 실패:", error);
+      alert("영화 수정에 실패했습니다 😢");
+    }
+  };
+
+  // 편집 모드 시작
+  const startEdit = (movie: Movie) => {
+    setEditingMovie(movie);
+    setEditTitle(movie.title);
+    setEditOverview(movie.overview || "");
+  };
+
+  // 편집 취소
+  const cancelEdit = () => {
+    setEditingMovie(null);
+    setEditTitle("");
+    setEditOverview("");
   };
 
   const searchMovies = async (query: string) => {
@@ -800,56 +851,163 @@ function App() {
               }}
             >
               {myMovies.map((movie) => (
-                <div
-                  key={movie.id}
-                  style={{
-                    backgroundColor: "#2a2a2a",
-                    borderRadius: "15px",
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
-                  }}
-                  onClick={() => openModal(movie)}
-                >
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "300px",
-                      backgroundColor: "#444",
-                      display: "flex",
-                      alignItems: "center",
-                      fontSize: "60px",
-                    }}
-                  >
-                    🎬
-                  </div>
-                  <div style={{ padding: "15px" }}>
-                    <h3
+                <div key={movie.id}>
+                  {editingMovie?.id === movie.id ? (
+                    // 편집 모드
+                    <div
                       style={{
-                        fontSize: "18px",
-                        marginBottom: "8px",
+                        backgroundColor: "#2a2a2a",
+                        borderRadius: "15px",
+                        padding: "20px",
                         color: "white",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
                       }}
                     >
-                      {movie.title}
-                    </h3>
-                    <p
+                      <h3 style={{ marginBottom: "15px", fontSize: "18px" }}>
+                        ✏️ 영화 수정
+                      </h3>
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          marginBottom: "10px",
+                          fontSize: "16px",
+                          border: "2px solid #444",
+                          borderRadius: "8px",
+                          backgroundColor: "#1a1a1a",
+                          color: "white",
+                          outline: "none",
+                        }}
+                      />
+                      <textarea
+                        value={editOverview}
+                        onChange={(e) => setEditOverview(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          marginBottom: "15px",
+                          fontSize: "14px",
+                          border: "2px solid #444",
+                          borderRadius: "8px",
+                          backgroundColor: "#1a1a1a",
+                          color: "white",
+                          outline: "none",
+                          minHeight: "80px",
+                          resize: "vertical",
+                        }}
+                      />
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <button
+                          onClick={() => updateMovie(movie.id)}
+                          style={{
+                            flex: 1,
+                            padding: "10px",
+                            fontSize: "14px",
+                            backgroundColor: "#667eea",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          💾 저장
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          style={{
+                            flex: 1,
+                            padding: "10px",
+                            fontSize: "14px",
+                            backgroundColor: "#f44336",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ❌ 취소
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // 일반 모드
+                    <div
                       style={{
-                        fontSize: "14px",
-                        color: "#999",
-                        marginBottom: "12px",
+                        backgroundColor: "#2a2a2a",
+                        borderRadius: "15px",
                         overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
+                        transition: "all 0.3s ease",
+                        boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
                       }}
                     >
-                      {movie.overview || "줄거리 없음"}
-                    </p>
-                  </div>
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "300px",
+                          backgroundColor: "#444",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "60px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => openModal(movie)}
+                      >
+                        🎬
+                      </div>
+                      <div style={{ padding: "15px" }}>
+                        <h3
+                          style={{
+                            fontSize: "18px",
+                            marginBottom: "8px",
+                            color: "white",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {movie.title}
+                        </h3>
+                        <p
+                          style={{
+                            fontSize: "14px",
+                            color: "#999",
+                            marginBottom: "12px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {movie.overview || "줄거리 없음"}
+                        </p>
+
+                        {/* 편집 버튼 */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEdit(movie);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "10px",
+                            fontSize: "14px",
+                            backgroundColor: "#667eea",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ✏️ 편집
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

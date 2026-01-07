@@ -31,6 +31,11 @@ function App() {
 
   const [myMovies, setMyMovies] = useState<Movie[]>([]);
 
+  // 영화 추가용 state
+  const [newMovieTitle, setNewMovieTitle] = useState("");
+  const [newMovieOverview, setNewMovieOverview] = useState("");
+  const [isAddingMovie, setIsAddingMovie] = useState(false);
+
   // 모달
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null); // 클릭한 영화 정보
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림/닫힘 상태
@@ -82,6 +87,38 @@ function App() {
       setMyMovies(data);
     } catch (error) {
       console.error("내 영화 목록 불러오기 실패:", error);
+    }
+  };
+
+  // 영화 추가 함수
+  const addMovie = async () => {
+    if (!newMovieTitle.trim()) {
+      alert("영화 제목을 입력해주세요!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/movies`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: newMovieTitle,
+          overview: newMovieOverview,
+        }),
+      });
+
+      if (response.ok) {
+        alert("🎉 영화가 추가되었습니다!");
+        setNewMovieTitle("");
+        setNewMovieOverview("");
+        setIsAddingMovie(false);
+        fetchMyMovies(); // 목록 새로고침
+      }
+    } catch (error) {
+      console.error("영화 추가 실패:", error);
+      alert("영화 추가에 실패했습니다 😢");
     }
   };
 
@@ -332,147 +369,151 @@ function App() {
       )}
 
       {/* 영화 목록 (인기/검색) */}
-      {activeTab !== "favorites" && activeTab !== 'myMovies' && !loading && movies.length > 0 && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: "30px",
-            maxWidth: "1400px",
-            margin: "0 auto",
-          }}
-        >
-          {movies.map((movie) => (
-            <div
-              key={movie.id}
-              style={{
-                /* 영화 카드 스타일 */ backgroundColor: "#2a2a2a",
-                borderRadius: "15px",
-                overflow: "hidden",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
-              }}
-              onClick={() => openModal(movie)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-10px)";
-                e.currentTarget.style.boxShadow = "0 8px 12px rgba(0,0,0,0.4)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.3)";
-              }}
-            >
-              {/* 포스터 */}
-              {movie.poster_path ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                  style={{
-                    width: "100%",
-                    height: "300px",
-                    objectFit: "cover",
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: "100%",
-                    height: "300px",
-                    backgroundColor: "#444",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "64px",
-                    background:
-                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  }}
-                >
-                  🎬
-                </div>
-              )}
+      {activeTab !== "favorites" &&
+        activeTab !== "myMovies" &&
+        !loading &&
+        movies.length > 0 && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "30px",
+              maxWidth: "1400px",
+              margin: "0 auto",
+            }}
+          >
+            {movies.map((movie) => (
+              <div
+                key={movie.id}
+                style={{
+                  /* 영화 카드 스타일 */ backgroundColor: "#2a2a2a",
+                  borderRadius: "15px",
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
+                }}
+                onClick={() => openModal(movie)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-10px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 12px rgba(0,0,0,0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.3)";
+                }}
+              >
+                {/* 포스터 */}
+                {movie.poster_path ? (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    alt={movie.title}
+                    style={{
+                      width: "100%",
+                      height: "300px",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "300px",
+                      backgroundColor: "#444",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "64px",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    }}
+                  >
+                    🎬
+                  </div>
+                )}
 
-              <div style={{ padding: "15px" }}>
-                <h3
-                  style={{
-                    fontSize: "16px",
-                    margin: "0 0 8px 0",
-                    fontWeight: "bold",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {movie.title}
-                </h3>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingTop: "10px",
-                    borderTop: "1px solid #444",
-                  }}
-                >
-                  <span
+                <div style={{ padding: "15px" }}>
+                  <h3
                     style={{
                       fontSize: "16px",
+                      margin: "0 0 8px 0",
                       fontWeight: "bold",
-                      color: "#ffd700",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    ⭐ {movie.vote_average.toFixed(1)}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "14px",
-                      color: "#999",
-                    }}
-                  >
-                    {movie.release_date?.split("-")[0]}
-                  </span>
-                </div>
+                    {movie.title}
+                  </h3>
 
-                {/* 즐겨찾기 탭 */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (isFavorite(movie.id)) {
-                      removeFavorite(movie.id);
-                    } else {
-                      addFavorite(movie);
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    marginTop: "10px",
-                    padding: "10px",
-                    fontSize: "14px",
-                    backgroundColor: isFavorite(movie.id)
-                      ? "#f44336"
-                      : "#667eea",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                    transition: "all 0.3s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = "0.8";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = "1";
-                  }}
-                >
-                  {isFavorite(movie.id) ? "💔 즐겨찾기 해제" : "💖 즐겨찾기"}
-                </button>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingTop: "10px",
+                      borderTop: "1px solid #444",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        color: "#ffd700",
+                      }}
+                    >
+                      ⭐ {movie.vote_average.toFixed(1)}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        color: "#999",
+                      }}
+                    >
+                      {movie.release_date?.split("-")[0]}
+                    </span>
+                  </div>
+
+                  {/* 즐겨찾기 탭 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isFavorite(movie.id)) {
+                        removeFavorite(movie.id);
+                      } else {
+                        addFavorite(movie);
+                      }
+                    }}
+                    style={{
+                      width: "100%",
+                      marginTop: "10px",
+                      padding: "10px",
+                      fontSize: "14px",
+                      backgroundColor: isFavorite(movie.id)
+                        ? "#f44336"
+                        : "#667eea",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                      transition: "all 0.3s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.opacity = "0.8";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = "1";
+                    }}
+                  >
+                    {isFavorite(movie.id) ? "💔 즐겨찾기 해제" : "💖 즐겨찾기"}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
       {/* 즐겨찾기 탭 */}
       {activeTab === "favorites" && (
@@ -628,6 +669,115 @@ function App() {
       {/* 내 영화 탭 */}
       {activeTab === "myMovies" && (
         <div>
+          {/* 영화 추가 버튼 & 폼 */}
+          <div
+            style={{
+              maxWidth: "800px",
+              margin: "0 auto 40px",
+              padding: "20px",
+              backgroundColor: "#2a2a2a",
+              borderRadius: "15px",
+            }}
+          >
+            {!isAddingMovie ? (
+              <button
+                onClick={() => setIsAddingMovie(true)}
+                style={{
+                  width: "100%",
+                  padding: "15px",
+                  fontSize: "18px",
+                  backgroundColor: "#667eea",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                ✨ 새 영화 추가하기 ✨
+              </button>
+            ) : (
+              <div style={{ color: "white" }}>
+                <h3 style={{ marginBottom: "20px", fontSize: "20px" }}>
+                  ✨ 새 영화 추가 ✨
+                </h3>
+                <input
+                  type="text"
+                  placeholder="영화 제목"
+                  value={newMovieTitle}
+                  onChange={(e) => setNewMovieTitle(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    marginBottom: "15px",
+                    fontSize: "16px",
+                    border: "2px solid #444",
+                    borderRadius: "8px",
+                    backgroundColor: "#1a1a1a",
+                    color: "white",
+                    outline: "none",
+                  }}
+                />
+                <textarea
+                  placeholder="줄거리"
+                  value={newMovieOverview}
+                  onChange={(e) => setNewMovieOverview(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    marginBottom: "15px",
+                    fontSize: "16px",
+                    border: "2px solid #444",
+                    borderRadius: "8px",
+                    backgroundColor: "#1a1a1a",
+                    color: "white",
+                    outline: "none",
+                    minHeight: "100px",
+                    resize: "vertical",
+                  }}
+                />
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button
+                    onClick={addMovie}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      fontSize: "16px",
+                      backgroundColor: "#667eea",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    💾 저장
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsAddingMovie(false);
+                      setNewMovieTitle("");
+                      setNewMovieOverview("");
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      fontSize: "16px",
+                      backgroundColor: "#f44336",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ❌ 취소
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {myMovies.length === 0 ? (
             <div
               style={{

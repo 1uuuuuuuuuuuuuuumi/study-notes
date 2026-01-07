@@ -690,23 +690,31 @@ function App() {
                         borderTop: "1px solid #444",
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: "16px",
-                          fontWeight: "bold",
-                          color: "#ffd700",
-                        }}
-                      >
-                        ⭐ {movie.vote_average.toFixed(1)}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "14px",
-                          color: "#999",
-                        }}
-                      >
-                        {movie.release_date?.split("-")[0]}
-                      </span>
+                      {movie.vote_average ? (
+                        <>
+                          <span
+                            style={{
+                              fontSize: "16px",
+                              fontWeight: "bold",
+                              color: "#ffd700",
+                            }}
+                          >
+                            ⭐ {movie.vote_average.toFixed(1)}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: "14px",
+                              color: "#999",
+                            }}
+                          >
+                            {movie.release_date?.split("-")[0]}
+                          </span>
+                        </>
+                      ) : (
+                        <span style={{ fontSize: "14px", color: "#999" }}>
+                          💾 내 영화
+                        </span>
+                      )}
                     </div>
 
                     <button
@@ -1015,6 +1023,7 @@ function App() {
                           style={{
                             width: "100%",
                             padding: "10px",
+                            margin: "5px 0",
                             fontSize: "14px",
                             backgroundColor: "#667eea",
                             color: "white",
@@ -1160,9 +1169,22 @@ function App() {
                     fontSize: "18px",
                   }}
                 >
-                  <span style={{ color: "#ffd700", fontWeight: "bold" }}>
-                    ⭐ {selectedMovie.release_date}
-                  </span>
+                  {selectedMovie.vote_average && (
+                    <span style={{ color: "#ffd700", fontWeight: "bold" }}>
+                      ⭐ {selectedMovie.vote_average.toFixed(1)}
+                    </span>
+                  )}
+                  {selectedMovie.release_date && (
+                    <span style={{ color: "#999" }}>
+                      📅 {selectedMovie.release_date.split("-")[0]}
+                    </span>
+                  )}
+                  {!selectedMovie.vote_average &&
+                    !selectedMovie.release_date && (
+                      <span style={{ color: "#999", fontSize: "16px" }}>
+                        💾 내 영화 컬렉션
+                      </span>
+                    )}
                 </div>
 
                 <div style={{ marginBottom: "20px" }}>

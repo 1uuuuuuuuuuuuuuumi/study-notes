@@ -173,6 +173,27 @@ function App() {
     setEditOverview("");
   };
 
+  // 영화 삭제 함수
+  const deleteMovie = async (id: number, title: string) => {
+    if (!window.confirm(`"${title}" 영화를 정말 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/movies/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        alert("🗑️ 영화가 삭제되었습니다!");
+        fetchMyMovies(); // 목록 새로고침
+      }
+    } catch (error) {
+      console.error("영화 삭제 실패:", error);
+      alert("영화 삭제에 실패했습니다 😢");
+    }
+  };
+
   const searchMovies = async (query: string) => {
     if (query.trim() === "") {
       fetchPopularMovies();
@@ -1003,7 +1024,28 @@ function App() {
                             fontWeight: "bold",
                           }}
                         >
-                          ✏️ 편집
+                          ✏️ 편집 ✏️
+                        </button>
+
+                        {/* 삭제 버튼 */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteMovie(movie.id, movie.title);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "10px",
+                            fontSize: "14px",
+                            backgroundColor: "#f44336",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          🗑️ 삭제 🗑️
                         </button>
                       </div>
                     </div>

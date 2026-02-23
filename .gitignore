@@ -13,3 +13,6 @@ node_modules/
 
 # 환경설정/비밀키
 .env
+
+*.env
+*.env.*

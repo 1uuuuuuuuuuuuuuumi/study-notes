@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Stream Test</title>
+  </head>
+  <body>
+    <h1>Streaming Test</h1>
+    <button onclick="test()">테스트</button>
+    <div id="result"></div>
+
+    <script>
+      async function test() {
+        const response = await fetch("/stream-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "TypeScript란?" }),
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        const resultDiv = document.getElementById("result");
+        resultDiv.textContent = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6);
+              if (data === "[DONE]") {
+                console.log("Stream finished");
+                return;
+              }
+
+              try {
+                const json = JSON.parse(data);
+                resultDiv.textContent += json.content;
+              } catch (e) {}
+            }
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
